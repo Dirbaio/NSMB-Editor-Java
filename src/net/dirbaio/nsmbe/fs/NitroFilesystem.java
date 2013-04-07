@@ -17,6 +17,8 @@
 
 package net.dirbaio.nsmbe.fs;
 
+import net.dirbaio.nsmbe.util.ArrayReader;
+
 public class NitroFilesystem extends PhysicalFilesystem
 {
     public PhysicalFile fatFile, fntFile;
@@ -41,20 +43,20 @@ public class NitroFilesystem extends PhysicalFilesystem
         freeSpaceDelimiter = fntFile;
 
         //read the fnt
-        ByteArrayInputStream fnt = new ByteArrayInputStream(fntFile.getContents());
+        ArrayReader fnt = new ArrayReader(fntFile.getContents());
 
         loadDir(fnt, "root", 0xF000, mainDir);
 
     }
 
 
-    private void loadDir(ByteArrayInputStream fnt, String dirName, int dirID, Directory parent)
+    private void loadDir(ArrayReader fnt, String dirName, int dirID, Directory parent)
     {
         fnt.savePos();
         fnt.seek(8 * (dirID & 0xFFF));
-        int subTableOffs = fnt.readUInt();
+        int subTableOffs = fnt.readInt();
 
-        int fileID = fnt.readUShort();
+        int fileID = fnt.readShort();
 
         //Crappy hack for MKDS course .carc's. 
         //Their main dir starting ID is 2, which is weird...
@@ -72,11 +74,11 @@ public class NitroFilesystem extends PhysicalFilesystem
             boolean isDir = (data & 0x80) != 0;
             if (len == 0)
                 break;
-            String name = fnt.ReadString(len);
+            String name = fnt.readString(len);
 
             if (isDir)
             {
-                int subDirID = fnt.readUShort();
+                int subDirID = fnt.readShort();
                 loadDir(fnt, name, subDirID, thisDir);
             }
             else

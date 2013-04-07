@@ -4,6 +4,9 @@
  */
 package net.dirbaio.nsmbe;
 
+import java.io.IOException;
+import net.dirbaio.nsmbe.fs.NitroROMFilesystem;
+
 /**
  *
  * @author dirbaio
@@ -16,6 +19,15 @@ public class NSMBe
      */
     public static void main(String[] args)
     {
-        // TODO code application logic here
+        try
+        {
+            NitroROMFilesystem fs = new NitroROMFilesystem("nsmb.nds");
+            
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+        
     }
 }

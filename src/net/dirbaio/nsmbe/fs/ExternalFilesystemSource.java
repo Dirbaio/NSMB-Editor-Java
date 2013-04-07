@@ -40,7 +40,7 @@ public class ExternalFilesystemSource extends FilesystemSource
         }
         catch (IOException ex)
         {
-            throw new RuntimeException(ex);
+            throw new RuntimeException("Error when seeking to "+pos, ex);
         }
     }
 

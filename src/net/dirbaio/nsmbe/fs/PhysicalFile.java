@@ -118,6 +118,8 @@ public class PhysicalFile extends FileWithLock
             else
                 fileSize = (int)end +  - fileBegin;
         }
+        
+        System.out.println(name + " " + fileBegin + " " + fileSize);
     }
 
     void saveOffsets()

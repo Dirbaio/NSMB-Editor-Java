@@ -73,13 +73,17 @@ public abstract class File implements Comparable<File>
     public int getUintAt(int offset)
     {
         byte[] data = getInterval(offset, offset+4);
-        return data[0] | (data[1]<<8) | (data[2]<<16) | (data[3]<<24);
+        return (data[0]&0xFF) 
+                | ((data[1]&0xFF)<<8)
+                | ((data[2]&0xFF)<<16) 
+                | ((data[3]&0xFF)<<24);
     }
 
     public int getUshortAt(int offset)
     {
         byte[] data = getInterval(offset, offset+2);
-        return data[0] | (data[1]<<8);
+        return (data[0]&0xFF)
+                | ((data[1]&0xFF)<<8);
     }
     public byte getByteAt(int offset)
     {

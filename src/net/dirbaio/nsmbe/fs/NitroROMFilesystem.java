@@ -18,6 +18,7 @@
 package net.dirbaio.nsmbe.fs;
 
 import java.io.*;
+import net.dirbaio.nsmbe.util.ArrayReader;
 
 public class NitroROMFilesystem extends NitroFilesystem
 {
@@ -90,18 +91,18 @@ public class NitroROMFilesystem extends NitroFilesystem
         addDir(dir);
         parent.childrenDirs.add(dir);
 
-        ByteArrayInputStream tbl = new ByteArrayInputStream(table.getContents());
+        ArrayReader tbl = new ArrayReader(table.getContents());
 
         int i = 0;
-        while (tbl.lengthAvailable(32))
+        while (tbl.available(32))
         {
-            int ovId = tbl.readUInt();
-            int ramAddr = tbl.readUInt();
-            int ramSize = tbl.readUInt();
-            int bssSize = tbl.readUInt();
-            int staticInitStart = tbl.readUInt();
-            int staticInitEnd = tbl.readUInt();
-            int fileID = tbl.readUShort();
+            int ovId = tbl.readInt();
+            int ramAddr = tbl.readInt();
+            int ramSize = tbl.readInt();
+            int bssSize = tbl.readInt();
+            int staticInitStart = tbl.readInt();
+            int staticInitEnd = tbl.readInt();
+            int fileID = tbl.readShort();
             tbl.skip(6); //unused 0's
 
             File f = loadFile(dirName+"_"+ovId+".bin", fileID, dir);
@@ -114,7 +115,7 @@ public class NitroROMFilesystem extends NitroFilesystem
     @Override
     public void fileMoved(File f)
     {
-        if (!ROM.dlpMode)
+        if (true) //!ROM.dlpMode)
         {
             int end = getFilesystemEnd();
             headerFile.setUintAt(0x80, end);
