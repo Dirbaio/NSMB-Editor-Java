@@ -66,16 +66,18 @@ public abstract class Filesystem
     protected void addFile(File f)
     {
         allFiles.add(f);
-        if(f.getId() != -1)
-            filesById.put(f.getId(), f);
+        if(filesById.containsKey(f.getId()))
+            throw new RuntimeException("Duplicate file ID");
+        filesById.put(f.getId(), f);
     }
 
 
     protected void addDir(Directory d)
     {
         allDirs.add(d);
-        if(d.getId() != -1)
-            dirsById.put(d.getId(), d);
+        if(dirsById.containsKey(d.getId()))
+            throw new RuntimeException("Duplicate dir ID");
+        dirsById.put(d.getId(), d);
     }
 
     public void fileMoved(File f) {}

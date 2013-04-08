@@ -6,6 +6,7 @@ package net.dirbaio.nsmbe;
 
 import java.io.IOException;
 import net.dirbaio.nsmbe.fs.NitroROMFilesystem;
+import net.dirbaio.nsmbe.server.Server;
 
 /**
  *
@@ -22,7 +23,8 @@ public class NSMBe
         try
         {
             NitroROMFilesystem fs = new NitroROMFilesystem("nsmb.nds");
-            
+            Server s = new Server(fs);
+            s.run();
         }
         catch (IOException ex)
         {

@@ -23,7 +23,7 @@ public class HeaderFile extends PhysicalFile
 {
     public HeaderFile(Filesystem parent, Directory parentDir)
     {
-        super(parent, parentDir, -1, "header.bin", 0, 0x4000);
+        super(parent, parentDir, -8, "header.bin", 0, 0x4000);
     }
 
     public void UpdateCRC16()

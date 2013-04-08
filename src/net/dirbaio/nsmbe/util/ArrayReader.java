@@ -131,4 +131,10 @@ public class ArrayReader
         
         return res;
     }
+    
+    public String readString()
+    {
+        int len = readShort();
+        return readString(len);
+    }
 }

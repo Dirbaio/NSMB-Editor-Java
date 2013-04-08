@@ -23,7 +23,7 @@ public class BannerFile extends PhysicalFile
 {
     public BannerFile(Filesystem parent, Directory parentDir, File headerFile)
     {
-        super(parent, parentDir, -8, "banner.bin", 0x840, headerFile, 0x68);
+        super(parent, parentDir, -9, "banner.bin", 0x840, headerFile, 0x68);
     }
 
     //Hack to prevent stack overflow...

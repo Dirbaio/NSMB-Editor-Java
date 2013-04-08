@@ -18,8 +18,6 @@
 package net.dirbaio.nsmbe.fs;
 
 import java.util.*;
-import java.util.logging.*;
-
 
 public class PhysicalFile extends FileWithLock
 {
@@ -118,8 +116,6 @@ public class PhysicalFile extends FileWithLock
             else
                 fileSize = (int)end +  - fileBegin;
         }
-        
-        System.out.println(name + " " + fileBegin + " " + fileSize);
     }
 
     void saveOffsets()
