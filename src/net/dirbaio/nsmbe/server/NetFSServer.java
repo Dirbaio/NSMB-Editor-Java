@@ -20,23 +20,21 @@ package net.dirbaio.nsmbe.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashSet;
 import net.dirbaio.nsmbe.fs.AlreadyEditingException;
 import net.dirbaio.nsmbe.fs.Directory;
 import net.dirbaio.nsmbe.fs.File;
 import net.dirbaio.nsmbe.fs.Filesystem;
 import net.dirbaio.nsmbe.util.ArrayReader;
 import net.dirbaio.nsmbe.util.ArrayWriter;
-import org.omg.CosNaming.NamingContextPackage.AlreadyBound;
 
-public class Server 
+public class NetFSServer 
 {
     Filesystem fs;
     ServerSocket listener;
     boolean running;
     
     
-    public Server(Filesystem fs)
+    public NetFSServer(Filesystem fs)
     {
         this.fs = fs;
     }
@@ -48,13 +46,13 @@ public class Server
         while(running)
         {
             Socket s = listener.accept();
-            Client t = new Client(this, s);
+            NetFSClientConnection t = new NetFSClientConnection(this, s);
             t.start();
         }
     }
     
     
-    public synchronized void handlePacket(byte[] packet, Client c) throws IOException
+    public synchronized void handlePacket(byte[] packet, NetFSClientConnection c) throws IOException
     {
         byte[] response = null;
         int error = 0;

@@ -24,15 +24,15 @@ import java.util.HashSet;
 import net.dirbaio.nsmbe.fs.File;
 import net.dirbaio.nsmbe.util.ArrayReader;
 
-public class Client extends Thread
+public class NetFSClientConnection extends Thread
 {
-    Server server;
+    NetFSServer server;
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
     HashSet<File> lockedFiles = new HashSet<>();
 
-    public Client(Server server, Socket socket)
+    public NetFSClientConnection(NetFSServer server, Socket socket)
     {
         this.server = server;
         this.socket = socket;
