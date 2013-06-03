@@ -33,6 +33,8 @@ public class NSMBe
              out.write(data);
              out.close();
              */
+            
+            /*
             System.out.println("ID  FID START        END          BSSEND     FLAGS");
             System.out.println("==================================================");
 
@@ -41,7 +43,7 @@ public class NSMBe
                 Overlay o = rom.arm9ovs[i];
                 System.out.println(num(o.id) + " " + num(o.getFileId()) + " " + hex(o.getRamAddr()) + " - " + hex(o.getRamAddr() + o.getRamSize()) + " - " + hex(o.getRamAddr() + o.getRamSize() + o.getBssSize()) + " " + o.getFlags());
             }
-
+*/
             Analyzer a = new Analyzer(rom);
 //            NetFSServer s = new NetFSServer(fs);
 //            s.run();
