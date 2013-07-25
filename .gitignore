@@ -1,5 +1,6 @@
 *.nds
 *.class
+*.php
 
 # Package Files #
 *.jar

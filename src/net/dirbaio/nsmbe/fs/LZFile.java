@@ -14,7 +14,6 @@
  *   You should have received a copy of the GNU General Public License
  *   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.dirbaio.nsmbe.fs;
 
 import net.dirbaio.nsmbe.util.*;
@@ -79,12 +78,12 @@ public class LZFile extends FileWithLock
     public byte[] getInterval(int start, int end)
     {
         validateInterval(start, end);
-        
+
         if (comp == COMP_NONE)
             return parentFile.getInterval(start, end);
 
         byte[] data = parentFile.getContents();
-        if(comp == COMP_LZ)
+        if (comp == COMP_LZ)
             data = LZ.decompress(data);
         else if (comp == COMP_LZHEADER)
             data = LZ.decompressHeadered(data);
@@ -107,7 +106,7 @@ public class LZFile extends FileWithLock
         else
         {
             byte[] data = parentFile.getContents();
-            if(comp == COMP_LZ)
+            if (comp == COMP_LZ)
                 data = LZ.decompress(data);
             else if (comp == COMP_LZHEADER)
                 data = LZ.decompressHeadered(data);
@@ -116,7 +115,7 @@ public class LZFile extends FileWithLock
 
             System.arraycopy(newFile, 0, data, start, newFile.length);
 
-            if(comp == COMP_LZ)
+            if (comp == COMP_LZ)
                 parentFile.replace(LZ.compress(data), this);
             else if (comp == COMP_LZHEADER)
                 parentFile.replace(LZ.compressHeadered(data), this);

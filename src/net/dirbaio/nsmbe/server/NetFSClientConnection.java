@@ -26,6 +26,7 @@ import net.dirbaio.nsmbe.util.ArrayReader;
 
 public class NetFSClientConnection extends Thread
 {
+
     NetFSServer server;
     Socket socket;
     DataInputStream in;
@@ -54,20 +55,19 @@ public class NetFSClientConnection extends Thread
                 in.readFully(dlen);
                 ArrayReader r = new ArrayReader(dlen);
                 int len = r.readInt();
-                
+
                 byte[] packet = new byte[len];
                 in.readFully(packet);
                 server.handlePacket(packet, this);
             }
-        }
-        catch (IOException ex)
+        } catch (IOException ex)
         {
             ex.printStackTrace();
         }
-        
-        for(File f : lockedFiles)
+
+        for (File f : lockedFiles)
             f.endEdit(this);
-        
+
         System.out.println(socket.getRemoteSocketAddress() + " disconnected.");
     }
 }

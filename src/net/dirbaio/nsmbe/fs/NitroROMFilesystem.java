@@ -1,20 +1,19 @@
 /*
-*   This file is part of NSMB Editor 5.
-*
-*   NSMB Editor 5 is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   NSMB Editor 5 is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ *   This file is part of NSMB Editor 5.
+ *
+ *   NSMB Editor 5 is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   NSMB Editor 5 is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.dirbaio.nsmbe.fs;
 
 import java.io.*;
@@ -22,6 +21,7 @@ import net.dirbaio.nsmbe.util.ArrayReader;
 
 public class NitroROMFilesystem extends NitroFilesystem
 {
+
     public PhysicalFile arm7binFile, arm7ovFile, arm9ovFile, bannerFile;
     public PhysicalFile arm9binFile;
     public PhysicalFile rsaSigFile;
@@ -62,7 +62,7 @@ public class NitroROMFilesystem extends NitroFilesystem
             headerFile.setUintAt(0x1000, rsaOffs);
         }
 
-        rsaSigFile = new PhysicalFile(this, mainDir, -7, "rsasig.bin", (int)rsaOffs, 136);
+        rsaSigFile = new PhysicalFile(this, mainDir, -7, "rsasig.bin", (int) rsaOffs, 136);
         rsaSigFile.canChangeOffset = false;
 
         addFile(headerFile);
@@ -105,7 +105,7 @@ public class NitroROMFilesystem extends NitroFilesystem
             int fileID = tbl.readShort();
             tbl.skip(6); //unused 0's
 
-            File f = loadFile(dirName+"_"+ovId+".bin", fileID, dir);
+            File f = loadFile(dirName + "_" + ovId + ".bin", fileID, dir);
 //                f.isSystemFile = true;
 
             i++;

@@ -18,6 +18,7 @@ package net.dirbaio.nsmbe.util;
 
 public class BackLZ
 {
+
     public static byte[] compress(byte[] data)
     {
         return data;
@@ -70,8 +71,7 @@ public class BackLZ
                         data[outpos] = data[outpos + wdisp + 1];
                         outpos--;
                     }
-                }
-                else
+                } else
                 {
                     if (inpos <= limit)
                     {

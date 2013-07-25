@@ -1,33 +1,33 @@
 /*
-*   This file is part of NSMB Editor 5.
-*
-*   NSMB Editor 5 is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   NSMB Editor 5 is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ *   This file is part of NSMB Editor 5.
+ *
+ *   NSMB Editor 5 is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   NSMB Editor 5 is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.dirbaio.nsmbe.fs;
 
 import net.dirbaio.nsmbe.util.ArrayReader;
 
 public class NitroFilesystem extends PhysicalFilesystem
 {
+
     public PhysicalFile fatFile, fntFile;
 
     public NitroFilesystem(FilesystemSource s)
     {
         super(s);
-        
-        mainDir = new Directory(this, null, true, "FILESYSTEM ["+s+"]", -100);
+
+        mainDir = new Directory(this, null, true, "FILESYSTEM [" + s + "]", -100);
         load();
     }
 
@@ -46,9 +46,7 @@ public class NitroFilesystem extends PhysicalFilesystem
         ArrayReader fnt = new ArrayReader(fntFile.getContents());
 
         loadDir(fnt, "root", 0xF000, mainDir);
-
     }
-
 
     private void loadDir(ArrayReader fnt, String dirName, int dirID, Directory parent)
     {
@@ -66,7 +64,7 @@ public class NitroFilesystem extends PhysicalFilesystem
         addDir(thisDir);
         parent.childrenDirs.add(thisDir);
 
-        fnt.seek((int)subTableOffs);
+        fnt.seek((int) subTableOffs);
         while (true)
         {
             byte data = fnt.readByte();
@@ -80,8 +78,7 @@ public class NitroFilesystem extends PhysicalFilesystem
             {
                 int subDirID = fnt.readShort();
                 loadDir(fnt, name, subDirID, thisDir);
-            }
-            else
+            } else
             {
                 loadFile(name, fileID, thisDir);
                 fileID++;
@@ -94,22 +91,19 @@ public class NitroFilesystem extends PhysicalFilesystem
     {
         boolean ok = true;
         for (int i = 0; i < fatFile.fileSize / 8; i++)
-        {
             if (getFileById(i) == null)
                 ok = false;
-        }
 
-        if (ok) return;
+        if (ok)
+            return;
 
         Directory d = new Directory(this, parent, true, "Unnamed files", -94);
         parent.childrenDirs.add(d);
         allDirs.add(d);
 
         for (int i = 0; i < fatFile.fileSize / 8; i++)
-        {
             if (getFileById(i) == null)
                 loadFile("File " + i, i, d);
-        }
     }
 
     protected File loadFile(String fileName, int fileID, Directory parent)

@@ -1,31 +1,30 @@
 /*
-*   This file is part of NSMB Editor 5.
-*
-*   NSMB Editor 5 is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   NSMB Editor 5 is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ *   This file is part of NSMB Editor 5.
+ *
+ *   NSMB Editor 5 is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   NSMB Editor 5 is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.dirbaio.nsmbe.fs;
 
 import net.dirbaio.nsmbe.util.*;
 
 public class BannerFile extends PhysicalFile
 {
+
     public BannerFile(Filesystem parent, Directory parentDir, File headerFile)
     {
         super(parent, parentDir, -9, "banner.bin", 0x840, headerFile, 0x68);
     }
-
     //Hack to prevent stack overflow...
     private boolean updatingCrc = false;
 
@@ -44,7 +43,7 @@ public class BannerFile extends PhysicalFile
     public void editionEnded()
     {
         super.editionEnded();
-        if(!updatingCrc)
+        if (!updatingCrc)
             updateCRC16();
     }
 }

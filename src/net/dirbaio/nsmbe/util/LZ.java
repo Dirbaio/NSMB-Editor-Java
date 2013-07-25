@@ -18,6 +18,7 @@ package net.dirbaio.nsmbe.util;
 
 public class LZ
 {
+
     public static byte[] compress(byte[] data)
     {
         ArrayWriter res = new ArrayWriter();
@@ -79,8 +80,7 @@ public class LZ
                     tempBuffer[tempBufferCursor++] = (byte) ((((searchLen - 3) & 0xF) << 4) + ((searchDisp >> 8) & 0xF));
                     tempBuffer[tempBufferCursor++] = (byte) (searchDisp & 0xFF);
                     current += searchLen;
-                }
-                else
+                } else
                     tempBuffer[tempBufferCursor++] = data[current++];
             }
 
@@ -110,7 +110,7 @@ public class LZ
                 {
                     if ((d & 0x80) != 0)
                     {
-                        data = ((source[xin] << 8) | source[xin + 1]);
+                        data = (((source[xin] & 0xFF) << 8) | (source[xin + 1] & 0xFF));
                         xin += 2;
                         length = (data >> 12) + 3;
                         offset = data & 0xFFF;
@@ -122,8 +122,7 @@ public class LZ
                             if (len == 0)
                                 return dest;
                         }
-                    }
-                    else
+                    } else
                     {
                         dest[xout++] = source[xin++];
                         len--;

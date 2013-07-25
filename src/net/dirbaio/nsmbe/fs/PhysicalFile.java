@@ -1,49 +1,45 @@
 /*
-*   This file is part of NSMB Editor 5.
-*
-*   NSMB Editor 5 is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   NSMB Editor 5 is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ *   This file is part of NSMB Editor 5.
+ *
+ *   NSMB Editor 5 is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   NSMB Editor 5 is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.dirbaio.nsmbe.fs;
 
 import java.util.*;
 
 public class PhysicalFile extends FileWithLock
 {
-    public boolean isSystemFile;
 
+    public boolean isSystemFile;
     //File that specifies where the file begins.
     protected File beginFile;
     protected int beginOffset;
-
     //File that specifies where the file ends OR the file size.
     protected File endFile;
     protected int endOffset;
     protected boolean endIsSize;
-
     //If true, file begin/size can't change at all.
     //TODO: Make sure these are set properly. I think they aren't.
     public boolean canChangeOffset = true;
     public boolean canChangeSize = true;
-
     //File begin offset
     public int fileBegin;
+
     public int getFileBegin()
-    { 
+    {
         return fileBegin;
     }
-
     public int alignment = 4; // word align by default
 
     //WARNING: Constructor mess below !!!
@@ -81,7 +77,7 @@ public class PhysicalFile extends FileWithLock
         this.fileSize = alSize;
         refreshOffsets();
     }
-    
+
     public PhysicalFile(Filesystem parent, Directory parentDir, int id, String name, int alBeg, int alSize)
     {
         super(parent, parentDir, name, id);
@@ -95,26 +91,26 @@ public class PhysicalFile extends FileWithLock
 
     private int getFilesystemDataOffset()
     {
-        return ((PhysicalFilesystem)fs).getFileDataOffset();
+        return ((PhysicalFilesystem) fs).getFileDataOffset();
     }
-    
+
     private FilesystemSource getFilesystemSource()
     {
-        return ((PhysicalFilesystem)fs).source;
+        return ((PhysicalFilesystem) fs).source;
     }
-    
+
     private void refreshOffsets()
     {
         if (beginFile != null)
-            fileBegin = (int)beginFile.getUintAt(beginOffset) + getFilesystemDataOffset();
+            fileBegin = (int) beginFile.getUintAt(beginOffset) + getFilesystemDataOffset();
 
         if (endFile != null)
         {
-            int end = (int)endFile.getUintAt(endOffset);
+            int end = (int) endFile.getUintAt(endOffset);
             if (endIsSize)
-                fileSize = (int)end;
+                fileSize = (int) end;
             else
-                fileSize = (int)end +  - fileBegin;
+                fileSize = (int) end + -fileBegin;
         }
     }
 
@@ -138,7 +134,7 @@ public class PhysicalFile extends FileWithLock
 
         int len = end - start;
         FilesystemSource s = getFilesystemSource();
-        s.seek(fileBegin+start);
+        s.seek(fileBegin + start);
         return s.read(len);
     }
 
@@ -153,11 +149,11 @@ public class PhysicalFile extends FileWithLock
     @Override
     public void replaceInterval(byte[] newFile, int start)
     {
-        validateInterval(start, start+newFile.length);
-        if(!editedIntervals.contains(new Interval(start, start+newFile.length)) && editedBy == null)
+        validateInterval(start, start + newFile.length);
+        if (!isIntervalEditable(new Interval(start, start + newFile.length)))
             throw new RuntimeException("Incorrect interval: " + name);
         FilesystemSource s = getFilesystemSource();
-        s.seek(fileBegin+start);
+        s.seek(fileBegin + start);
         s.write(newFile);
     }
 
@@ -165,42 +161,39 @@ public class PhysicalFile extends FileWithLock
     @Override
     public void replace(byte[] newFile, Object editor)
     {
-        if(!isAGoodEditor(editor))
+        if (!isAGoodEditor(editor))
             throw new RuntimeException("NOT CORRECT EDITOR " + name);
 
-        if(newFile.length != fileSize && !canChangeSize)
+        if (newFile.length != fileSize && !canChangeSize)
             throw new RuntimeException("TRYING TO RESIZE CONSTANT-SIZE FILE: " + name);
 
         int newStart = fileBegin;
 
         //if we insert a bigger file it might not fit in the current place
-        if (newFile.length > fileSize) 
-        {
+        if (newFile.length > fileSize)
             if (canChangeOffset && !(fs instanceof NarcFilesystem))
             {
-                newStart = ((PhysicalFilesystem)fs).findFreeSpace(newFile.length, alignment);
+                newStart = ((PhysicalFilesystem) fs).findFreeSpace(newFile.length, alignment);
                 if (newStart % alignment != 0)
                     newStart += alignment - newStart % alignment;
-            }
-            else
+            } else
             {
                 //TODO: Keep the list always sorted in order to avoid stupid useless sorts.
                 Collections.sort(fs.allFiles);
                 if (!(fs.allFiles.indexOf(this) == fs.allFiles.size() - 1))
                 {
                     PhysicalFile nextFile = (PhysicalFile) fs.allFiles.get(fs.allFiles.indexOf(this) + 1);
-                    ((PhysicalFilesystem)fs).moveAllFiles(nextFile, fileBegin + newFile.length);
+                    ((PhysicalFilesystem) fs).moveAllFiles(nextFile, fileBegin + newFile.length);
                 }
             }
-        }
         //This is for keeping NARC filesystems compact. Sucks.
-        else if(fs instanceof NarcFilesystem)
+        else if (fs instanceof NarcFilesystem)
         {
             Collections.sort(fs.allFiles);
             if (!(fs.allFiles.indexOf(this) == fs.allFiles.size() - 1))
             {
                 PhysicalFile nextFile = (PhysicalFile) fs.allFiles.get(fs.allFiles.indexOf(this) + 1);
-                ((PhysicalFilesystem)fs).moveAllFiles(nextFile, fileBegin + newFile.length);
+                ((PhysicalFilesystem) fs).moveAllFiles(nextFile, fileBegin + newFile.length);
             }
         }
 
@@ -214,7 +207,7 @@ public class PhysicalFile extends FileWithLock
         s.write(newFile);
 
         //This should be handled in NarcFilesystem instead, in fileMoved (?)
-        if(fs instanceof NarcFilesystem)
+        if (fs instanceof NarcFilesystem)
         {
             PhysicalFile lastFile = (PhysicalFile) fs.allFiles.get(fs.allFiles.size() - 1);
             s.setLength(lastFile.fileBegin + lastFile.fileSize + 16);
@@ -228,7 +221,7 @@ public class PhysicalFile extends FileWithLock
         //Updates total used rom size in header, and/or other stuff.
         fs.fileMoved(this);
     }
-    
+
     public void moveTo(int newOffs)
     {
         if (newOffs % alignment != 0)
@@ -243,9 +236,7 @@ public class PhysicalFile extends FileWithLock
         saveOffsets();
     }
 
-
     //Misc crap
-
     public boolean isAddrInFdile(int addr)
     {
         return addr >= fileBegin && addr < fileBegin + fileSize;
@@ -254,8 +245,8 @@ public class PhysicalFile extends FileWithLock
     @Override
     public int compareTo(File arg0)
     {
-        if(arg0 instanceof PhysicalFile)
-            return Integer.compare(fileBegin, ((PhysicalFile)arg0).fileBegin);
+        if (arg0 instanceof PhysicalFile)
+            return Integer.compare(fileBegin, ((PhysicalFile) arg0).fileBegin);
         else
             throw new UnsupportedOperationException("WHAT.");
     }

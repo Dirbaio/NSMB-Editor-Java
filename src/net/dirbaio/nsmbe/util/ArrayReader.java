@@ -21,6 +21,7 @@ import java.util.Stack;
 
 public class ArrayReader
 {
+
     byte[] data;
     private int pos = 0;
     private Stack<Integer> savedPos = new Stack<>();
@@ -60,7 +61,12 @@ public class ArrayReader
     {
         return data.length - pos >= len;
     }
-    
+
+    public int available()
+    {
+        return data.length - pos;
+    }
+
     public void seek(int pos)
     {
         if (pos < 0 || pos > data.length)
@@ -75,27 +81,25 @@ public class ArrayReader
 
         pos += bytes;
     }
-    
 
     public byte readByte()
     {
         return data[pos++];
     }
 
-
     public int readShort()
     {
         int res = 0;
         for (int i = 0; i < 2; i++)
-            res |= (int) (readByte()&0xFF) << 8 * i;
+            res |= (int) (readByte() & 0xFF) << 8 * i;
         return (int) res;
     }
-    
+
     public int readInt()
     {
         int res = 0;
         for (int i = 0; i < 4; i++)
-            res |= (int) (readByte()&0xFF) << 8 * i;
+            res |= (int) (readByte() & 0xFF) << 8 * i;
         return (int) res;
     }
 
@@ -103,38 +107,52 @@ public class ArrayReader
     {
         long res = 0;
         for (int i = 0; i < 8; i++)
-            res |= (long) (readByte()&0xFF) << 8 * i;
+            res |= (long) (readByte() & 0xFF) << 8 * i;
         return res;
     }
-    
+
     public void read(byte[] dest)
     {
-        if(!available(dest.length))
-            throw new InvalidParameterException("read() too much data: "+dest.length);
-        
+        if (!available(dest.length))
+            throw new InvalidParameterException("read() too much data: " + dest.length);
+
         System.arraycopy(data, pos, dest, 0, dest.length);
         pos += dest.length;
     }
-    
+
     public String readString(int len)
     {
-        if(!available(len))
-            throw new InvalidParameterException("readString() too much data: "+len);
+        if (!available(len))
+            throw new InvalidParameterException("readString() too much data: " + len);
 
         String res = "";
-        for(int i = 0; i < len; i++)
+        for (int i = 0; i < len; i++)
         {
             byte b = readByte();
-            if(b != 0)
-                res += (char)(b&0xFF);
+            if (b != 0)
+                res += (char) (b & 0xFF);
         }
-        
+
         return res;
     }
-    
+
     public String readString()
     {
         int len = readShort();
         return readString(len);
+    }
+
+    public String readCSharpString()
+    {
+        int len = readByte() & 0xFF;
+        return readString(len);
+    }
+
+    public byte[] readByteArray()
+    {
+        int len = readInt();
+        byte[] res = new byte[len];
+        read(res);
+        return res;
     }
 }

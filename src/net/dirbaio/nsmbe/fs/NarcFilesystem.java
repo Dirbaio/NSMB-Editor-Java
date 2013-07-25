@@ -1,20 +1,19 @@
 /*
-*   This file is part of NSMB Editor 5.
-*
-*   NSMB Editor 5 is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   NSMB Editor 5 is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ *   This file is part of NSMB Editor 5.
+ *
+ *   NSMB Editor 5 is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   NSMB Editor 5 is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.dirbaio.nsmbe.fs;
 
 public class NarcFilesystem extends NitroFilesystem
@@ -33,7 +32,7 @@ public class NarcFilesystem extends NitroFilesystem
     {
 
         //I have to do some tricky offset calculations here ...
-        fatOffset= 0x1C;
+        fatOffset = 0x1C;
         source.seek(0x18); //number of files
         fatSize = source.readUInt() * 8;
 

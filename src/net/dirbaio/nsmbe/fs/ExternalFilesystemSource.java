@@ -1,20 +1,19 @@
 /*
-*   This file is part of NSMB Editor 5.
-*
-*   NSMB Editor 5 is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   NSMB Editor 5 is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ *   This file is part of NSMB Editor 5.
+ *
+ *   NSMB Editor 5 is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   NSMB Editor 5 is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with NSMB Editor 5.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.dirbaio.nsmbe.fs;
 
 import java.io.*;
@@ -22,9 +21,10 @@ import java.util.logging.*;
 
 public class ExternalFilesystemSource extends FilesystemSource
 {
+
     public String fileName;
     RandomAccessFile f;
-    
+
     public ExternalFilesystemSource(String n) throws IOException
     {
         this.fileName = n;
@@ -37,10 +37,9 @@ public class ExternalFilesystemSource extends FilesystemSource
         try
         {
             f.seek(pos);
-        }
-        catch (IOException ex)
+        } catch (IOException ex)
         {
-            throw new RuntimeException("Error when seeking to "+pos, ex);
+            throw new RuntimeException("Error when seeking to " + pos, ex);
         }
     }
 
@@ -52,8 +51,7 @@ public class ExternalFilesystemSource extends FilesystemSource
             byte[] res = new byte[len];
             f.read(res);
             return res;
-        }
-        catch (IOException ex)
+        } catch (IOException ex)
         {
             throw new RuntimeException(ex);
         }
@@ -65,8 +63,7 @@ public class ExternalFilesystemSource extends FilesystemSource
         try
         {
             f.write(data);
-        }
-        catch (IOException ex)
+        } catch (IOException ex)
         {
             throw new RuntimeException(ex);
         }
@@ -83,8 +80,7 @@ public class ExternalFilesystemSource extends FilesystemSource
         try
         {
             f.close();
-        }
-        catch (IOException ex)
+        } catch (IOException ex)
         {
             throw new RuntimeException(ex);
         }
@@ -101,6 +97,4 @@ public class ExternalFilesystemSource extends FilesystemSource
     {
         throw new UnsupportedOperationException("Is this really needed?!");
     }
-
 }
-

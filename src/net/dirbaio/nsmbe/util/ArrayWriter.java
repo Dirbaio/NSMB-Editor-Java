@@ -20,6 +20,7 @@ public class ArrayWriter
 {
     //implements an unbonded array to store unlimited data.
     //writes in amortized constant time.
+
     private byte[] buf = new byte[16];
     private int pos = 0;
 
@@ -46,6 +47,11 @@ public class ArrayWriter
 
         buf[pos] = b;
         pos++;
+    }
+
+    public void writeByte(int b)
+    {
+        writeByte((byte) b);
     }
 
     public void writeShort(short u)
@@ -101,12 +107,25 @@ public class ArrayWriter
             writeByte((byte) s.charAt(i));
     }
 
+    public void writeCSharpString(String s)
+    {
+        writeByte((byte) s.length());
+        for (int i = 0; i < s.length(); i++)
+            writeByte((byte) s.charAt(i));
+    }
+
     public void writeString(String s, int len)
     {
         for (int i = 0; i < len; i++)
             if (len < s.length())
                 writeByte((byte) s.charAt(i));
             else
-                writeByte((byte)0);
+                writeByte((byte) 0);
+    }
+
+    public void writeByteArray(byte[] data)
+    {
+        writeInt(data.length);
+        write(data);
     }
 }

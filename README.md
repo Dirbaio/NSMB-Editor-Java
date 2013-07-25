@@ -1,4 +1,4 @@
-jnds
-====
+NSMB Editor Java
+================
 
-Java code for editing NDS roms and files.
+WIP port of NSMBe to Java
