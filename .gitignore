@@ -8,3 +8,5 @@
 *.ear
 /build/
 /dist/
+/nbproject/private/
+
