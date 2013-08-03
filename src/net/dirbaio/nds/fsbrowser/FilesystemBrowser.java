@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import net.dirbaio.nds.fs.Directory;
 import net.dirbaio.nds.fs.File;
 import net.dirbaio.nds.fs.Filesystem;
@@ -44,16 +45,16 @@ public class FilesystemBrowser extends javax.swing.JPanel
     private DefaultMutableTreeNode makeTree(Directory d)
     {
         DefaultMutableTreeNode t = new DefaultMutableTreeNode(d);
-        
-        for(Directory d2 : d.childrenDirs)
+
+        for (Directory d2 : d.childrenDirs)
             t.add(makeTree(d2));
-        
-        for(File f : d.childrenFiles)
+
+        for (File f : d.childrenFiles)
             t.add(makeTree(f));
-        
+
         return t;
     }
-    
+
     private DefaultMutableTreeNode makeTree(File f)
     {
         DefaultMutableTreeNode t = new DefaultMutableTreeNode(f);
@@ -71,8 +72,6 @@ public class FilesystemBrowser extends javax.swing.JPanel
     {
 
         optionsPanel = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         infoLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -82,13 +81,6 @@ public class FilesystemBrowser extends javax.swing.JPanel
         setLayout(new java.awt.BorderLayout());
 
         optionsPanel.setPreferredSize(new java.awt.Dimension(120, 0));
-
-        jButton2.setText("adfa");
-        optionsPanel.add(jButton2);
-
-        jButton1.setText("jButton1");
-        optionsPanel.add(jButton1);
-
         add(optionsPanel, java.awt.BorderLayout.LINE_START);
 
         jPanel2.setLayout(new java.awt.BorderLayout());
@@ -97,6 +89,13 @@ public class FilesystemBrowser extends javax.swing.JPanel
         jPanel2.add(infoLabel, java.awt.BorderLayout.PAGE_END);
 
         fsTree.setName("fsTree"); // NOI18N
+        fsTree.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mousePressed(java.awt.event.MouseEvent evt)
+            {
+                fsTreeMousePressed(evt);
+            }
+        });
         fsTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener()
         {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt)
@@ -115,23 +114,23 @@ public class FilesystemBrowser extends javax.swing.JPanel
     {//GEN-HEADEREND:event_fsTreeValueChanged
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
         Object obj = node.getUserObject();
-        
+
         String text = "";
         optionsPanel.removeAll();
-        
-        if(obj instanceof File)
+
+        if (obj instanceof File)
         {
             final File f = (File) obj;
             FileType ft = FileType.typeForFile(f);
-            text = ft.toString()+" file, ID: "+f.getId()+", size: "+f.getFileSize()+" bytes";
-            
-            for(final FileAction act : Actions.actions)
-                if(act.canDoOn(ft))
+            text = ft.toString() + " file, ID: " + f.getId() + ", size: " + f.getFileSize() + " bytes";
+
+            for (final FileAction act : Actions.actions)
+                if (act.canDoOn(ft))
                 {
                     JButton but = new JButton(act.toString());
                     optionsPanel.add(but);
-                    but.addActionListener(new ActionListener() {
-
+                    but.addActionListener(new ActionListener()
+                    {
                         @Override
                         public void actionPerformed(ActionEvent e)
                         {
@@ -140,22 +139,46 @@ public class FilesystemBrowser extends javax.swing.JPanel
                     });
                 }
         }
-        else if(obj instanceof Directory)
+        else if (obj instanceof Directory)
         {
             Directory d = (Directory) obj;
-            text = "Directory, ID: "+d.getId();
+            text = "Directory, ID: " + d.getId();
         }
-        
+
         optionsPanel.invalidate();
         optionsPanel.repaint();
         infoLabel.setText(text);
     }//GEN-LAST:event_fsTreeValueChanged
 
+    private void fsTreeMousePressed(java.awt.event.MouseEvent evt)//GEN-FIRST:event_fsTreeMousePressed
+    {//GEN-HEADEREND:event_fsTreeMousePressed
+        int selRow = fsTree.getRowForLocation(evt.getX(), evt.getY());
+        TreePath selPath = fsTree.getPathForLocation(evt.getX(), evt.getY());
+        if (selRow != -1)
+            if (evt.getClickCount() == 2)
+                doubleClickedNode(((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject());
+    }//GEN-LAST:event_fsTreeMousePressed
+
+    private void doubleClickedNode(Object obj)
+    {
+        if (obj instanceof File)
+        {
+            final File f = (File) obj;
+            FileType ft = FileType.typeForFile(f);
+            
+            //Do first action
+            for (final FileAction act : Actions.actions)
+                if (act.canDoOn(ft))
+                {
+                    act.doOn(f);
+                    break;
+                }
+        }
+
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTree fsTree;
     private javax.swing.JLabel infoLabel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel optionsPanel;
