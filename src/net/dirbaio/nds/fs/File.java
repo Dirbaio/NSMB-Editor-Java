@@ -187,6 +187,6 @@ public abstract class File implements Comparable<File>
     @Override
     public String toString()
     {
-        return name + " (len=" + fileSize + ")";
+        return name;
     }
 }

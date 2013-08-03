@@ -21,7 +21,7 @@ import java.util.*;
 public abstract class PhysicalFilesystem extends Filesystem
 {
 
-    protected FilesystemSource source;
+    protected File source;
     protected File freeSpaceDelimiter;
     protected int fileDataOffset;
 
@@ -30,7 +30,7 @@ public abstract class PhysicalFilesystem extends Filesystem
         return fileDataOffset;
     }
 
-    protected PhysicalFilesystem(FilesystemSource fs)
+    protected PhysicalFilesystem(File fs)
     {
         this.source = fs;
     }
@@ -101,13 +101,11 @@ public abstract class PhysicalFilesystem extends Filesystem
 
 
         int fsEnd = getFilesystemEnd();
-        int toCopy = (int) fsEnd - (int) firstStart;
+        int copyLen = (int) fsEnd - (int) firstStart;
 
 
-        source.seek(firstStart);
-        byte[] data = source.read(toCopy);
-        source.seek(firstStart + diff);
-        source.write(data);
+        byte[] data = source.getInterval(firstStart, copyLen);
+        source.replaceInterval(data, firstStart+diff);
 
         for (int i = allFiles.indexOf(first); i < allFiles.size(); i++)
             ((PhysicalFile) allFiles.get(i)).fileBegin += diff;
@@ -118,13 +116,7 @@ public abstract class PhysicalFilesystem extends Filesystem
     @Override
     public void close()
     {
-        source.close();
-    }
-
-    @Override
-    public void save()
-    {
-        source.save();
+        source.endEdit(this);
     }
 
     public int getFilesystemEnd()

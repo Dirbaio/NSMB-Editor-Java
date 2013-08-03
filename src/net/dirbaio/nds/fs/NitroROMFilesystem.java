@@ -27,9 +27,9 @@ public class NitroROMFilesystem extends NitroFilesystem
     public PhysicalFile rsaSigFile;
     public HeaderFile headerFile;
 
-    public NitroROMFilesystem(String n) throws IOException
+    public NitroROMFilesystem(File f) throws IOException
     {
-        super(new ExternalFilesystemSource(n));
+        super(f);
     }
 
     @Override

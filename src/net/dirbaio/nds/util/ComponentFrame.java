@@ -14,24 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.dirbaio.nds.util;
+package net.dirbaio.nds.util;   
 
 import java.awt.BorderLayout;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-public class ComponentViewer extends JFrame
+public class ComponentFrame extends JFrame
 {
-
-    public ComponentViewer(JComponent i)
+    public ComponentFrame(JComponent i)
     {
-        super("Component Viewer");
+        this(i, false);
+    }
+
+    public ComponentFrame(JComponent i, boolean scrollPane)
+    {
+        super(i.toString());
         setSize(800, 500);
-        JScrollPane jsp = new JScrollPane(i);
-        jsp.setBorder(null);
-        add(jsp, BorderLayout.CENTER);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        if(scrollPane)
+        {
+            JScrollPane jsp = new JScrollPane(i);
+            jsp.setBorder(null);
+            add(jsp, BorderLayout.CENTER);
+        }
+        else
+            add(i, BorderLayout.CENTER);
+        
         pack();
         setVisible(true);
     }

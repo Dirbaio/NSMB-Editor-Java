@@ -16,12 +16,12 @@
  */
 package net.dirbaio.nds;
 
+import javax.swing.JFrame;
+import net.dirbaio.nds.fs.ExternalFile;
 import net.dirbaio.nds.nsmb.NSMBRom;
 import net.dirbaio.nds.fs.NitroROMFilesystem;
-import net.dirbaio.nds.nsmb.level.NSMBLevel;
-import net.dirbaio.nds.nsmb.level.source.InternalLevelSource;
-import net.dirbaio.nds.nsmb.leveleditor.LevelEditorComponent;
-import net.dirbaio.nds.util.ComponentViewer;
+import net.dirbaio.nds.fsbrowser.FilesystemBrowser;
+import net.dirbaio.nds.util.ComponentFrame;
 
 public class Main
 {
@@ -30,7 +30,7 @@ public class Main
     {
         try
         {
-            NitroROMFilesystem fs = new NitroROMFilesystem("nsmb.nds");
+            NitroROMFilesystem fs = new NitroROMFilesystem(new ExternalFile("nsmb.nds"));
             NSMBRom rom = new NSMBRom(fs);
             /*
              byte[] data = rom.arm9ovs[0].getDecompressedData();
@@ -53,9 +53,10 @@ public class Main
 //            NetFSServer s = new NetFSServer(fs);
 //            s.run();
 
-            NSMBLevel l = new NSMBLevel(rom, new InternalLevelSource(rom, "A01_1", "1-1"));
-            LevelEditorComponent ed = new LevelEditorComponent(l);
-            new ComponentViewer(ed);
+//            NSMBLevel l = new NSMBLevel(rom, new InternalLevelSource(rom, "A01_1", "1-1"));
+//            LevelEditorComponent ed = new LevelEditorComponent(l);
+            new ComponentFrame(new FilesystemBrowser(fs)).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
             //new ImageViewer(l.GFX.Tilesets[0].Map16Buffer);
             /*
              File f = new LZFile(rom.fs.getFileByName("d_2d_I_M_back_demo_castle_ncl.bin"), LZFile.COMP_LZ);

@@ -16,28 +16,25 @@
  */
 package net.dirbaio.nds.fs;
 
+import net.dirbaio.nds.util.CompressionType;
 import net.dirbaio.nds.util.LZ;
 
 public class LZFile extends FileWithLock
 {
-
     private File parentFile;
-    private int comp;
-    public static final int COMP_NONE = 0;
-    public static final int COMP_LZ = 1;
-    public static final int COMP_LZHEADER = 2;
+    private CompressionType comp;
 
-    public LZFile(File parent, int ct)
+    public LZFile(File parent, CompressionType ct)
     {
         name = parent.name;
         parentFile = parent;
         comp = ct;
 
-        if (comp == COMP_NONE)
+        if (comp == CompressionType.None)
             fileSize = parent.fileSize;
-        else if (comp == COMP_LZ)
+        else if (comp == CompressionType.Lz)
             fileSize = LZ.getDecompressedSize(parent.getInterval(0, 4));
-        else if (comp == COMP_LZHEADER)
+        else if (comp == CompressionType.LzWithHeader)
             fileSize = LZ.getDecompressedSizeHeadered(parent.getInterval(0, 8));
         else
             throw new UnsupportedOperationException("Bad LZFile Type: " + comp);
@@ -46,11 +43,11 @@ public class LZFile extends FileWithLock
     @Override
     public byte[] getContents()
     {
-        if (comp == COMP_NONE)
+        if (comp == CompressionType.None)
             return parentFile.getContents();
-        else if (comp == COMP_LZ)
+        else if (comp == CompressionType.Lz)
             return LZ.decompress(parentFile.getContents());
-        else if (comp == COMP_LZHEADER)
+        else if (comp == CompressionType.LzWithHeader)
             return LZ.decompressHeadered(parentFile.getContents());
         else
             throw new UnsupportedOperationException("Bad LZFile Type: " + comp);
@@ -62,11 +59,11 @@ public class LZFile extends FileWithLock
         if (!isAGoodEditor(editor))
             throw new RuntimeException("NOT CORRECT EDITOR " + name);
 
-        if (comp == COMP_NONE)
+        if (comp == CompressionType.None)
             parentFile.replace(newFile, this);
-        else if (comp == COMP_LZ)
+        else if (comp == CompressionType.Lz)
             parentFile.replace(LZ.compress(newFile), this);
-        if (comp == COMP_LZHEADER)
+        if (comp == CompressionType.LzWithHeader)
             parentFile.replace(LZ.compressHeadered(newFile), this);
         else
             throw new UnsupportedOperationException("Bad LZFile Type: " + comp);
@@ -79,13 +76,13 @@ public class LZFile extends FileWithLock
     {
         validateInterval(start, end);
 
-        if (comp == COMP_NONE)
+        if (comp == CompressionType.None)
             return parentFile.getInterval(start, end);
 
         byte[] data = parentFile.getContents();
-        if (comp == COMP_LZ)
+        if (comp == CompressionType.Lz)
             data = LZ.decompress(data);
-        else if (comp == COMP_LZHEADER)
+        else if (comp == CompressionType.LzWithHeader)
             data = LZ.decompressHeadered(data);
         else
             throw new UnsupportedOperationException("Bad LZFile Type: " + comp);
@@ -101,23 +98,23 @@ public class LZFile extends FileWithLock
     {
         validateInterval(start, start + newFile.length);
 
-        if (comp == COMP_NONE)
+        if (comp == CompressionType.None)
             parentFile.replaceInterval(newFile, start);
         else
         {
             byte[] data = parentFile.getContents();
-            if (comp == COMP_LZ)
+            if (comp == CompressionType.Lz)
                 data = LZ.decompress(data);
-            else if (comp == COMP_LZHEADER)
+            else if (comp == CompressionType.LzWithHeader)
                 data = LZ.decompressHeadered(data);
             else
                 throw new UnsupportedOperationException("Bad LZFile Type: " + comp);
 
             System.arraycopy(newFile, 0, data, start, newFile.length);
 
-            if (comp == COMP_LZ)
+            if (comp == CompressionType.Lz)
                 parentFile.replace(LZ.compress(data), this);
-            else if (comp == COMP_LZHEADER)
+            else if (comp == CompressionType.LzWithHeader)
                 parentFile.replace(LZ.compressHeadered(data), this);
         }
     }

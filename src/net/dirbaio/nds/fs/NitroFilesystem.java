@@ -23,11 +23,11 @@ public class NitroFilesystem extends PhysicalFilesystem
 
     public PhysicalFile fatFile, fntFile;
 
-    public NitroFilesystem(FilesystemSource s)
+    public NitroFilesystem(File s)
     {
         super(s);
 
-        mainDir = new Directory(this, null, true, "FILESYSTEM [" + s + "]", -100);
+        mainDir = new Directory(this, null, true, s.toString(), -100);
         load();
     }
 

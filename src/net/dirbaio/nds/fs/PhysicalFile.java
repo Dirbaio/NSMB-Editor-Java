@@ -94,7 +94,7 @@ public class PhysicalFile extends FileWithLock
         return ((PhysicalFilesystem) fs).getFileDataOffset();
     }
 
-    private FilesystemSource getFilesystemSource()
+    private File getFilesystemSource()
     {
         return ((PhysicalFilesystem) fs).source;
     }
@@ -131,19 +131,13 @@ public class PhysicalFile extends FileWithLock
     public byte[] getInterval(int start, int end)
     {
         validateInterval(start, end);
-
-        int len = end - start;
-        FilesystemSource s = getFilesystemSource();
-        s.seek(fileBegin + start);
-        return s.read(len);
+        return getFilesystemSource().getInterval(fileBegin+start, fileBegin+end);
     }
 
     @Override
     public byte[] getContents()
     {
-        FilesystemSource s = getFilesystemSource();
-        s.seek(fileBegin);
-        return s.read(fileSize);
+        return getFilesystemSource().getInterval(fileBegin, fileBegin+fileSize);
     }
 
     @Override
@@ -152,9 +146,8 @@ public class PhysicalFile extends FileWithLock
         validateInterval(start, start + newFile.length);
         if (!isIntervalEditable(new Interval(start, start + newFile.length)))
             throw new RuntimeException("Incorrect interval: " + name);
-        FilesystemSource s = getFilesystemSource();
-        s.seek(fileBegin + start);
-        s.write(newFile);
+
+        getFilesystemSource().replaceInterval(newFile, fileBegin+start);
     }
 
     //TODO: Clean up this mess.
@@ -202,15 +195,15 @@ public class PhysicalFile extends FileWithLock
             System.out.println("Warning: File is not being aligned: " + name + ", at " + newStart);
 
         //write the file
-        FilesystemSource s = getFilesystemSource();
-        s.seek(newStart);
-        s.write(newFile);
+        File s = getFilesystemSource();
+        s.replaceInterval(newFile, newStart);
 
         //This should be handled in NarcFilesystem instead, in fileMoved (?)
         if (fs instanceof NarcFilesystem)
         {
+            //TODO FIXOR
             PhysicalFile lastFile = (PhysicalFile) fs.allFiles.get(fs.allFiles.size() - 1);
-            s.setLength(lastFile.fileBegin + lastFile.fileSize + 16);
+            //s.setLength(lastFile.fileBegin + lastFile.fileSize + 16);
         }
 
         //update ending pos
@@ -228,18 +221,11 @@ public class PhysicalFile extends FileWithLock
             System.out.println("Warning: File is not being aligned: " + name + ", at " + newOffs);
 
         byte[] data = getContents();
-        FilesystemSource s = getFilesystemSource();
-        s.seek(newOffs);
-        s.write(data);
-
+        File s = getFilesystemSource();
+        s.replaceInterval(data, newOffs);
+        
         fileBegin = newOffs;
         saveOffsets();
-    }
-
-    //Misc crap
-    public boolean isAddrInFdile(int addr)
-    {
-        return addr >= fileBegin && addr < fileBegin + fileSize;
     }
 
     @Override

@@ -46,8 +46,8 @@ public class Directory
     {
         return parentDir;
     }
-    public List<File> childrenFiles = new ArrayList<File>();
-    public List<Directory> childrenDirs = new ArrayList<Directory>();
+    public List<File> childrenFiles = new ArrayList<>();
+    public List<Directory> childrenDirs = new ArrayList<>();
     private Filesystem parent;
 
     public Directory(Filesystem parent, Directory parentDir, boolean system, String name, int id)
@@ -66,4 +66,12 @@ public class Directory
         else
             return parentDir.getPath() + "/" + name;
     }
+
+    @Override
+    public String toString()
+    {
+        return name+"/";
+    }
+    
+    
 }

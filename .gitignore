@@ -3,7 +3,6 @@
 *.php
 
 # Package Files #
-*.jar
 *.war
 *.ear
 /build/

@@ -24,7 +24,7 @@ public class NarcFilesystem extends NitroFilesystem
 
     public NarcFilesystem(File f) throws AlreadyEditingException
     {
-        super(new FileFilesystemSource(f));
+        super(f);
     }
 
     @Override
@@ -33,11 +33,9 @@ public class NarcFilesystem extends NitroFilesystem
 
         //I have to do some tricky offset calculations here ...
         fatOffset = 0x1C;
-        source.seek(0x18); //number of files
-        fatSize = source.readUInt() * 8;
+        fatSize = source.getUintAt(0x18)*8; //number of files
 
-        source.seek(fatSize + fatOffset + 4); //size of FNTB
-        fntSize = source.readUInt() - 8; //do not include header
+        fntSize = source.getUintAt(fatSize + fatOffset + 4) - 8; //size of FNTB, do not include header
         fntOffset = fatSize + fatOffset + 8;
 
         fileDataOffset = fntSize + fntOffset + 8;
@@ -46,12 +44,5 @@ public class NarcFilesystem extends NitroFilesystem
 
         super.load();
         loadNamelessFiles(mainDir);
-    }
-
-    //TODO: Find a better method of saving. Maybe on-demand (a button)?
-    @Override
-    public void fileMoved(File f)
-    {
-        source.save();
     }
 }

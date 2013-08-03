@@ -32,6 +32,7 @@ import net.dirbaio.nds.graphics.Palette;
 import net.dirbaio.nds.tilemap.Map16Tilemap;
 import net.dirbaio.nds.util.ArrayReader;
 import net.dirbaio.nds.util.ArrayWriter;
+import net.dirbaio.nds.util.CompressionType;
 import net.dirbaio.nds.util.LZ;
 import net.dirbaio.nds.util.Resources;
 
@@ -181,12 +182,12 @@ public class NSMBTileset
 
         palettes = new Palette[palCount];
 
-        LZFile PalFileLz = new LZFile(PalFile, LZFile.COMP_LZ);
+        LZFile PalFileLz = new LZFile(PalFile, CompressionType.Lz);
         for (int i = 0; i < palCount; i++)
             palettes[i] = new FilePalette(new InlineFile(PalFileLz, i * 512, 512, "Palette " + i));
 
         //Graphics
-        graphics = new Image2D(new LZFile(GFXFile, LZFile.COMP_LZ), 256, false);
+        graphics = new Image2D(new LZFile(GFXFile, CompressionType.Lz), 256, false);
         //Map16
         map16 = new Map16Tilemap(Map16File, 32, graphics, palettes, getMap16TileOffset(), getMap16PaletteOffset());
         Overrides = new short[map16.getMap16TileCount()];
@@ -307,7 +308,7 @@ public class NSMBTileset
         TileBehaviorFile.replace(file.getArray(), this);
     }
 
-    public class ObjectDef
+    public final class ObjectDef
     {
 
         public ArrayList<ArrayList<ObjectDefTile>> tiles;
@@ -395,7 +396,7 @@ public class NSMBTileset
         }
     }
 
-    public class ObjectDefTile
+    public final class ObjectDefTile
     {
 
         public int tileID;
@@ -761,18 +762,17 @@ public class NSMBTileset
 
     public void exportTileset(String filename) throws IOException
     {
-        DataOutputStream out = new DataOutputStream(new FileOutputStream(filename));
-
-        out.writeUTF(tilesetFileHeader);
-        writeFileContents(PalFile, out);
-        writeFileContents(GFXFile, out);
-        writeFileContents(Map16File, out);
-        writeFileContents(ObjFile, out);
-        writeFileContents(ObjIndexFile, out);
-        if (TileBehaviorFile != null)
-            writeFileContents(TileBehaviorFile, out);
-
-        out.close();
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(filename)))
+        {
+            out.writeUTF(tilesetFileHeader);
+            writeFileContents(PalFile, out);
+            writeFileContents(GFXFile, out);
+            writeFileContents(Map16File, out);
+            writeFileContents(ObjFile, out);
+            writeFileContents(ObjIndexFile, out);
+            if (TileBehaviorFile != null)
+                writeFileContents(TileBehaviorFile, out);
+        }
     }
 
     private void writeFileContents(File f, DataOutputStream out) throws IOException

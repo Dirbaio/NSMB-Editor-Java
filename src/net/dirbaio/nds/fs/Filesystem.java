@@ -83,11 +83,6 @@ public abstract class Filesystem
     {
     }
 
-    //Saving and closing
-    public void save()
-    {
-    }
-
     public void close()
     {
     }
