@@ -259,7 +259,7 @@ public class NSMBObject implements LevelItem
                 srcRect.x = (t % 16) * 16;
                 srcRect.y = (t / 16) * 16;
 
-                g.drawImage(GFX.Tilesets[Tileset].Map16Buffer, destRect.x, destRect.y, 16, 16, srcRect.x, srcRect.y, 16, 16, null);
+                g.drawImage(GFX.Tilesets[Tileset].Map16Buffer, destRect.x, destRect.y, destRect.x+16, destRect.y+16, srcRect.x, srcRect.y, srcRect.x+16, srcRect.y+16, null);
 
                 if (!GFX.Tilesets[Tileset].UseOverrides)
                     continue;
@@ -270,7 +270,7 @@ public class NSMBObject implements LevelItem
                 srcRect.x = t2 * 16;
                 srcRect.y = 0;
 
-                g.drawImage(GFX.Tilesets[Tileset].OverrideBufferedImage, destRect.x, destRect.y, 16, 16, srcRect.x, srcRect.y, 16, 16, null);
+                g.drawImage(GFX.Tilesets[Tileset].OverrideBufferedImage, destRect.x, destRect.y, destRect.x+16, destRect.y+16, srcRect.x, srcRect.y, srcRect.x+16, srcRect.y+16, null);
                 //int overridenum = Array.IndexOf(NSMBTileset.BehaviorOverrides, GFX.Tilesets[Tileset].TileBehaviors[t]);
                 //if (overridenum > -1)
                 //    g.drawImage(Resources.get("tileoverrides2"), destRect.x, destRect.y, new Rectangle(overridenum * 16, 0, 16, 16), GraphicsUnit.Pixel);

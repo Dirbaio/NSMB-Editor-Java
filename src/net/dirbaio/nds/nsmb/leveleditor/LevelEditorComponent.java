@@ -48,7 +48,9 @@ import net.dirbaio.nds.util.Util;
 public class LevelEditorComponent extends JComponent implements MouseListener, MouseMotionListener
 {
 
-    public NSMBLevel level;
+    public final NSMBLevel level;
+    public final LevelEditor editor;
+    
     TilemapRenderer renderer;
     boolean showGrid = true;
     public Rectangle pixels, blocks;
@@ -70,13 +72,14 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
     ArrayList<LevelItem> CurSelectedObjs = new ArrayList<>();
     boolean removing = false;
 
-    public LevelEditorComponent(NSMBLevel l)
+    public LevelEditorComponent(NSMBLevel level, LevelEditor editor)
     {
-        this.level = l;
+        this.level = level;
+        this.editor = editor;
         setPreferredSize(new Dimension(512 * 16, 256 * 16));
         setSize(new Dimension(512 * 16, 256 * 16));
 
-        renderer = new TilemapRenderer(l.levelTilemap, l.GFX);
+        renderer = new TilemapRenderer(level.levelTilemap, level.GFX);
         undo = new UndoManager(this);
 
         addMouseListener(this);

@@ -18,8 +18,8 @@ package net.dirbaio.nds.fs;
 
 public abstract class File implements Comparable<File>
 {
-
     protected Filesystem fs;
+
 
     public Filesystem getFilesystem()
     {

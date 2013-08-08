@@ -45,4 +45,9 @@ public class Colors
     public static final Color progressPath = new Color(0x228B22);
     public static final Color progressPathText = new Color(0xFFFFFF);
     public static final Color progressPathLine = new Color(0x8090EE90, true);
+    
+    public static final Color objectPickerBackground = new Color(0xFFFFFF);
+    public static final Color objectPickerObjBackground = new Color(0x778899);
+    public static final Color objectPickerObjBorder = new Color(0xB0C4DE);
+    public static final Color objectPickerObjSelected = new Color(0xFF8800);
 }

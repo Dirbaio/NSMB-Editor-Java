@@ -17,10 +17,15 @@
 package net.dirbaio.nds;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import net.dirbaio.nds.fs.ExternalFile;
 import net.dirbaio.nds.nsmb.NSMBRom;
 import net.dirbaio.nds.fs.NitroROMFilesystem;
-import net.dirbaio.nds.fsbrowser.FilesystemBrowser;
+import net.dirbaio.nds.nsmb.level.NSMBLevel;
+import net.dirbaio.nds.nsmb.level.source.InternalLevelSource;
+import net.dirbaio.nds.nsmb.leveleditor.LevelEditor;
+import net.dirbaio.nds.nsmb.leveleditor.ObjectAndTilesetChooser;
+import net.dirbaio.nds.nsmb.leveleditor.ObjectChooser;
 import net.dirbaio.nds.util.ComponentFrame;
 
 public class Main
@@ -53,9 +58,12 @@ public class Main
 //            NetFSServer s = new NetFSServer(fs);
 //            s.run();
 
-//            NSMBLevel l = new NSMBLevel(rom, new InternalLevelSource(rom, "A01_1", "1-1"));
-//            LevelEditorComponent ed = new LevelEditorComponent(l);
-            new ComponentFrame(new FilesystemBrowser(fs)).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            NSMBLevel l = new NSMBLevel(rom, new InternalLevelSource(rom, "A01_1", "1-1"));
+            
+            new ComponentFrame(new LevelEditor(l), false).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            //LevelEditorComponent ed = new LevelEditorComponent(l);
+            //new ComponentFrame(ed, true).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//            new ComponentFrame(new FilesystemBrowser(fs)).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             //new ImageViewer(l.GFX.Tilesets[0].Map16Buffer);
             /*
