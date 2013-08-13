@@ -27,6 +27,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import net.dirbaio.nds.nsmb.level.LevelItem;
 import net.dirbaio.nds.nsmb.level.NSMBEntrance;
 import net.dirbaio.nds.nsmb.level.NSMBLevel;
@@ -50,7 +51,6 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
 
     public final NSMBLevel level;
     public final LevelEditor editor;
-    
     TilemapRenderer renderer;
     boolean showGrid = true;
     public Rectangle pixels, blocks;
@@ -60,8 +60,6 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
     boolean CloneMode, SelectMode;
     int dx, dy; //MouseDown position
     int lx, ly; //last position
-    boolean CreateObj;
-    NSMBObject newObj;
     MouseAction mouseAct = new MouseAction();
     int minBoundX, minBoundY; //the top left corner of the selected objects
     int maxBoundX, maxBoundY; //the top left corner of the selected objects
@@ -71,6 +69,10 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
     ArrayList<LevelItem> SelectedObjects = new ArrayList<>();
     ArrayList<LevelItem> CurSelectedObjs = new ArrayList<>();
     boolean removing = false;
+    public LevelItem placingItem;
+    private boolean createMode;
+    private boolean mouseIn = false;
+    private boolean selectionChanged;
 
     public LevelEditorComponent(NSMBLevel level, LevelEditor editor)
     {
@@ -84,8 +86,18 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
 
         addMouseListener(this);
         addMouseMotionListener(this);
+        
+        //placingItem = new NSMBObject(10, 0, 0, 0, 7, 7, level.GFX);
+        placingItem = new NSMBView();
+        placingItem.setRect(new Rectangle(0, 0, 100, 100));
     }
 
+    
+    private void updatePanel()
+    {
+        editor.setPanel((ArrayList<LevelItem>)SelectedObjects.clone());
+    }
+    
     @Override
     protected void paintComponent(Graphics gg)
     {
@@ -95,7 +107,6 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         blocks = new Rectangle(pixels.x / 16, pixels.y / 16, (pixels.width + 15) / 16, (pixels.height + 15) / 16);
         if (blocks.width == 512 || blocks.height == 256)
             return;
-
 
         // RENDER PANNING BLOCKS GRID
         for (int x = blocks.x / 16; x <= (blocks.width + blocks.x) / 16; x++)
@@ -153,6 +164,14 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         for (NSMBPath p : level.ProgressPaths)
             p.render(g, this);
 
+        if (placingItem != null && !SelectMode && mouseIn && SelectedObjects.isEmpty())
+        {
+            placingItem.render(g, this);
+            g.setColor(Colors.selected);
+            Rectangle r = placingItem.getRect();
+            g.drawRect(r.x, r.y, r.width, r.height);
+        }
+
         RenderSelection(g);
         /*
          // DS Screen preview
@@ -177,36 +196,20 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         int buttons = e.getButton();
         int modifiers = e.getModifiersEx();
 
-        //Right clicking creates a new object
-        if (buttons == MouseEvent.BUTTON3)/*
-             dx = x / 16;
-             dy = y / 16;
-             lx = x;
-             ly = y;
-             CreateObj = true;
-             if (tabs.SelectedTab == 2) //The sprite tab
-             {
-             NSMBSprite newSprite = new NSMBSprite(level);
-             newSprite.Type = tabs.sprites.getSelectedType();
-             if (newSprite.Type == -1)
-             return;
-             newSprite.Data = new byte[6];
-             newSprite.x = x;
-             newSprite.y = y;
-             undo.Do(new AddLvlItemAction(UndoManager.ObjToArrayList(newSprite)));
-             SelectObject(newSprite);
-             return;
-             }
-             newObj = new NSMBObject(tabs.objects.getObjectType(), tabs.objects.getTilesetNum(), dx, dy, 1, 1, level.GFX);
-             undo.Do(new AddLvlItemAction(UndoManager.ObjToArrayList(newObj)));
-             SelectObject(newObj);
-             return;*/
-
-            return;
         lx = x;
         ly = y;
         dx = x;
         dy = y;
+
+        //Right clicking creates a new object
+        if (buttons == MouseEvent.BUTTON3)
+        {
+            if(SelectedObjects.isEmpty())
+                createMode = true;
+            return;
+        }
+
+        createMode = false;
 
         mouseAct = getActionAtPos(x, y);
         if (mouseAct.nodeType != CreateNode.None)
@@ -243,15 +246,21 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
                 // Select an object
                 findSelectedObjects(x, y, x, y, true, true);
                 SelectMode = SelectedObjects.isEmpty();
+                selectionChanged = true;
             }
             else if (mouseAct.vert == ResizeType.ResizeNone && mouseAct.hor == ResizeType.ResizeNone)
             {
                 ArrayList<LevelItem> selectedObjectsBack = new ArrayList<>();
                 selectedObjectsBack.addAll(SelectedObjects);
 
+                boolean wasSelEmpty = SelectedObjects.isEmpty();
+                
                 // Select an object
                 findSelectedObjects(x, y, x, y, true, true);
 
+                if(!wasSelEmpty || !SelectedObjects.isEmpty())
+                    selectionChanged = true;
+                
                 if (SelectedObjects.isEmpty())
                     SelectMode = true;
                 else if (selectedObjectsBack.contains(SelectedObjects.get(0)))
@@ -276,16 +285,40 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
     @Override
     public void mouseReleased(MouseEvent e)
     {
+        if (createMode)
+        {
+            ArrayList<LevelItem> list = new ArrayList<>();
+            list.add(placingItem);
+            undo.Do(new AddLvlItemAction(list));
+            placingItem = editor.palette.getPlacingObject();
+            repaint();
+        }
+        
+        if(selectionChanged)
+        {
+            selectionChanged = false;
+            updatePanel();
+        }
+
+        mouseMoved(e);
+
+        SelectMode = false;
+        undo.merge = false;
+        repaint();
     }
 
     @Override
     public void mouseEntered(MouseEvent e)
     {
+        mouseIn = true;
+        repaint();
     }
 
     @Override
     public void mouseExited(MouseEvent e)
     {
+        mouseIn = false;
+        repaint();
     }
 
     @Override
@@ -294,33 +327,44 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         int x = e.getX();
         int y = e.getY();
 
+        if (lx == x && ly == y) // don't do anything if no move.
+            return;
+
         //Resize the new object that was created by right-clicking.
-        if (CreateObj && newObj != null)
+        if (createMode)
         {
-            Rectangle r = newObj.getRect();
-            x = Math.max(0, x / 16);
-            y = Math.max(0, y / 16);
-            if (x == lx && y == ly)
+            if (placingItem == null)
                 return;
+
+            x = Math.max(0, x);
+            y = Math.max(0, y);
+
+            int snap = placingItem.getSnap();
+            if (snapTo8Pixels)
+                snap = Math.max(snap, 8);
+
             lx = x;
             ly = y;
-            newObj.X = Math.min(lx, dx);
-            newObj.Y = Math.min(ly, dy);
-            newObj.Width = Math.abs(lx - dx) + 1;
-            newObj.Height = Math.abs(ly - dy) + 1;
-            newObj.UpdateObjCache();
-            Rectangle.union(r, newObj.getRect(), r);
-            level.repaintTilemap(r.x, r.y, r.width, r.height);
+            Rectangle r = new Rectangle();
+            r.x = Util.roundDown(Math.min(lx, dx), snap);
+            r.y = Util.roundDown(Math.min(ly, dy), snap);
+            r.width = Util.roundUp(Math.max(lx, dx) + 1, snap) - r.x;
+            r.height = Util.roundUp(Math.max(ly, dy) + 1, snap) - r.y;
+            placingItem.setRect(r);
+            if (placingItem instanceof NSMBObject)
+                ((NSMBObject) placingItem).UpdateObjCache();
+
             repaint();
             return;
         }
-
-        if (lx == x && ly == y) // don't clone objects if there instanceof no visible movement
+        if (e.getButton() == MouseEvent.BUTTON3)
             return;
-
         if (SelectMode)
         {
             findSelectedObjects(x, y, dx, dy, false, true);
+            if(!SelectedObjects.isEmpty())
+                selectionChanged = true;
+            
             lx = x;
             ly = y;
         }
@@ -431,7 +475,28 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
     @Override
     public void mouseMoved(MouseEvent e)
     {
+        if (!mouseIn)
+            repaint();
+
+        mouseIn = true;
+
         setCursor(Cursor.getPredefinedCursor(getCursorForPos(e.getX(), e.getY())));
+
+        if (placingItem != null)
+        {
+            Rectangle r = placingItem.getRect();
+            Rectangle r2 = new Rectangle(r);
+            int snap = placingItem.getSnap();
+            if(snapTo8Pixels)
+                snap = Math.max(snap, 8);
+            r2.x = Util.roundDown(e.getX() - r.width / 2 + snap/2, snap);
+            r2.y = Util.roundDown(e.getY() - r.height / 2 + snap/2, snap);
+            if (!r.equals(r2))
+            {
+                placingItem.setRect(r2);
+                repaint();
+            }
+        }
     }
 
     public void SelectObject(LevelItem o)
@@ -637,8 +702,10 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         }
 
         Rectangle r = new Rectangle(x1, y1, x2 - x1, y2 - y1);
-        if(r.width <= 0) r.width = 1;
-        if(r.height <= 0) r.height = 1;
+        if (r.width <= 0)
+            r.width = 1;
+        if (r.height <= 0)
+            r.height = 1;
         SelectionRectangle = r;
         for (NSMBObject o : level.Objects)
             selectIfInside(o, r);
@@ -748,18 +815,6 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
                 return act;
         }
         return act;
-    }
-
-    public void MouseUp()
-    {
-        if (CreateObj)
-            SelectObject(null);
-        CreateObj = false;
-        newObj = null;
-        SelectMode = false;
-        undo.merge = false;
-        repaint();
-//        tabs.SelectObjects(SelectedObjects);
     }
 
     private int getCursorForPos(int x, int y)

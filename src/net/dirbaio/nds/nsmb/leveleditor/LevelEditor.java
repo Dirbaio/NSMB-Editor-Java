@@ -14,33 +14,59 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.dirbaio.nds.nsmb.leveleditor;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import net.dirbaio.nds.nsmb.level.LevelItem;
 import net.dirbaio.nds.nsmb.level.NSMBLevel;
-
 
 public class LevelEditor extends JPanel
 {
+
     private final JSplitPane splitPane;
-    private final LevelEditorComponent editorControl;
-    
-    private NSMBLevel level;
+    public final LevelEditorComponent editorControl;
+    public final NSMBLevel level;
+    public final PalettePanel palette;
+
     public LevelEditor(NSMBLevel level)
     {
         super(new BorderLayout());
         this.level = level;
         splitPane = new JSplitPane();
-        
+
         add(splitPane, BorderLayout.CENTER);
-        
+
         editorControl = new LevelEditorComponent(level, this);
         splitPane.setRightComponent(new JScrollPane(editorControl));
+
+        palette = new PalettePanel(this);
+        setPanel(new ArrayList<LevelItem>());
     }
-    
-    
+    ArrayList<LevelItem> currentItems = null;
+
+    public final void setPanel(ArrayList<LevelItem> items)
+    {
+        if (currentItems != null && items.containsAll(currentItems) && currentItems.containsAll(items))
+            return;
+
+        currentItems = items;
+        
+        JComponent panel = palette;
+        
+        if(!items.isEmpty())
+        {
+            panel = new JTabbedPane();
+            
+        }            
+
+        int pos = splitPane.getDividerLocation();
+        splitPane.setLeftComponent(panel);
+        splitPane.setDividerLocation(pos);
+    }
 }

@@ -160,14 +160,16 @@ public class ObjectChooser extends JScrollPane
             g2d.setColor(Colors.objectPickerBackground);
             g2d.fillRect(0, 0, getWidth(), getHeight());
 
+            g2d.translate(8, 8);
             for (NSMBObject o : objects)
             {
                 g2d.setColor(o == selected ? Colors.objectPickerObjSelected : Colors.objectPickerObjBorder);
-                g2d.fillRect(o.X * 16 + 4, o.Y * 16 + 4, o.Width * 16 + 8, o.Height * 16 + 8);
+                g2d.fillRect(o.X * 16 - 4, o.Y * 16 - 4, o.Width * 16 + 8, o.Height * 16 + 8);
                 g2d.setColor(Colors.objectPickerObjBackground);
-                g2d.fillRect(o.X * 16 + 8, o.Y * 16 + 8, o.Width * 16, o.Height * 16);
-                o.RenderPlain(g2d, o.X * 16 + 8, o.Y * 16 + 8);
+                g2d.fillRect(o.X * 16, o.Y * 16, o.Width * 16, o.Height * 16);
+                o.render(g2d, null);
             }
+            g2d.translate(-8, -8);
         }
 
         @Override

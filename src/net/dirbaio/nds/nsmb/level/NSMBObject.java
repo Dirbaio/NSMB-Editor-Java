@@ -38,6 +38,15 @@ public class NSMBObject implements LevelItem
     {
     }
 
+    public NSMBObject(NSMBGraphics GFX)
+    {
+        this.GFX = GFX;
+        this.Width = 1;
+        this.Height = 1;
+        CachedObj = new int[Width][Height];
+        UpdateObjCache();
+    }
+
     public NSMBObject(int ObjNum, int Tileset, int X, int Y, int Width, int Height, NSMBGraphics GFX)
     {
         this.ObjNum = ObjNum;
@@ -113,7 +122,8 @@ public class NSMBObject implements LevelItem
         try
         {
             CachedObj = GFX.Tilesets[Tileset].RenderObject(ObjNum, Width, Height);
-        } catch (ObjectRenderingException e)
+        }
+        catch (ObjectRenderingException e)
         {
             e.printStackTrace();
         }
@@ -123,90 +133,40 @@ public class NSMBObject implements LevelItem
     @Override
     public void render(Graphics2D g, LevelEditorComponent ed)
     {
-//        //This method is really messy due to the quirky rendering of .NET
-//        //I need to do a lot of hacks to get objects rendered correctly with
-//        //high and low zoom.
-//
-//        if (badObject)
-//        {
-//            g.DrawRectangle(new Pen(Color.Red, 4), new Rectangle(X * 16, Y * 16, Width * 16, Height * 16));
-//            g.DrawLine(new Pen(Color.Red, 4), new Point(X * 16, (Y + Height) * 16), new Point((X + Width) * 16, (Y) * 16));
-//            g.DrawLine(new Pen(Color.Red, 4), new Point((X + Width) * 16, (Y + Height) * 16), new Point((X) * 16, (Y) * 16));
-//            return;
-//        }
-//
-//        if (ed.zoom > 1)
-//        {
-//            RectangleF srcRect = new RectangleF(0, 0, 16, 16);
-//            RectangleF destRect = new RectangleF(X << 4, Y << 4, 16, 16);
-//
-//            for (int xx = 0; xx < CachedObj.Getlength(0); xx++)
-//                for (int yy = 0; yy < CachedObj.Getlength(1); yy++)
-//                {
-//                    int t = CachedObj[xx][yy];
-//                    if (t < 0)
-//                        continue;
-//
-//                    destRect.x = (X + xx) << 4;
-//                    destRect.y = (Y + yy) << 4;
-//
-//                    srcRect.x = (t % 16) * 16 - 0.5f;
-//                    srcRect.y = (t / 16) * 16 - 0.5f;
-//
-//                    g.drawImage(GFX.Tilesets[Tileset].Map16Buffer, destRect.x, destRect.y, srcRect, GraphicsUnit.Pixel);
-//
-//                    if (!GFX.Tilesets[Tileset].UseOverrides)
-//                        continue;
-//                    int t2 = GFX.Tilesets[Tileset].Overrides[t];
-//                    if (t2 == -1)
-//                        continue;
-//                    if (t2 == 0)
-//                        continue;
-//
-//                    srcRect.x = t2 * 16 - 0.5f;
-//                    srcRect.y = 0 - 0.5f;
-//
-//                    g.drawImage(GFX.Tilesets[Tileset].OverrideBufferedImage, destRect.x, destRect.y, srcRect, GraphicsUnit.Pixel);
-//                    //int overridenum = Array.IndexOf(NSMBTileset.BehaviorOverrides, GFX.Tilesets[Tileset].TileBehaviors[t]);
-//                    //if (overridenum > -1)
-//                    //    g.drawImage(Resources.get("tileoverrides2"), destRect.x, destRect.y, new Rectangle(overridenum * 16, 0, 16, 16), GraphicsUnit.Pixel);
-//                }
-//        }
-//        else
-//        {
-//            Rectangle srcRect = new Rectangle(0, 0, 16, 16);
-//            Rectangle destRect = new Rectangle(X << 4, Y << 4, 16, 16);
-//
-//            for (int xx = 0; xx < CachedObj.Getlength(0); xx++)
-//                for (int yy = 0; yy < CachedObj.Getlength(1); yy++)
-//                {
-//                    int t = CachedObj[xx][yy];
-//                    if (t < 0)
-//                        continue;
-//
-//                    destRect.x = (X + xx) << 4;
-//                    destRect.y = (Y + yy) << 4;
-//
-//                    srcRect.x = (t % 16) * 16;
-//                    srcRect.y = (t / 16) * 16;
-//
-//                    g.drawImage(GFX.Tilesets[Tileset].Map16Buffer, destRect.x, destRect.y, srcRect, GraphicsUnit.Pixel);
-//
-//                    if (!GFX.Tilesets[Tileset].UseOverrides)
-//                        continue;
-//                    int t2 = GFX.Tilesets[Tileset].Overrides[t];
-//                    if (t2 <= 0)
-//                        continue;
-//
-//                    srcRect.x = t2 * 16;
-//                    srcRect.y = 0;
-//
-//                    g.drawImage(GFX.Tilesets[Tileset].OverrideBufferedImage, destRect.x, destRect.y, srcRect, GraphicsUnit.Pixel);
-//                    //int overridenum = Array.IndexOf(NSMBTileset.BehaviorOverrides, GFX.Tilesets[Tileset].TileBehaviors[t]);
-//                    //if (overridenum > -1)
-//                    //    g.drawImage(Resources.get("tileoverrides2"), destRect.x, destRect.y, new Rectangle(overridenum * 16, 0, 16, 16), GraphicsUnit.Pixel);
-//                }
-//        }
+        int X = this.X * 16;
+        int Y = this.Y * 16;
+        Rectangle srcRect = new Rectangle(0, 0, 16, 16);
+        Rectangle destRect = new Rectangle(X, Y, 16, 16);
+
+        for (int xx = 0; xx < CachedObj.length; xx++)
+            for (int yy = 0; yy < CachedObj[0].length; yy++)
+            {
+                int t = CachedObj[xx][yy];
+                if (t < 0)
+                    continue;
+
+                destRect.x = X + xx * 16;
+                destRect.y = Y + yy * 16;
+
+                srcRect.x = (t % 16) * 16;
+                srcRect.y = (t / 16) * 16;
+
+                g.drawImage(GFX.Tilesets[Tileset].Map16Buffer, destRect.x, destRect.y, destRect.x + 16, destRect.y + 16, srcRect.x, srcRect.y, srcRect.x + 16, srcRect.y + 16, null);
+
+                if (!GFX.Tilesets[Tileset].UseOverrides)
+                    continue;
+                int t2 = GFX.Tilesets[Tileset].Overrides[t];
+                if (t2 <= 0)
+                    continue;
+
+                srcRect.x = t2 * 16;
+                srcRect.y = 0;
+
+                g.drawImage(GFX.Tilesets[Tileset].OverrideBufferedImage, destRect.x, destRect.y, destRect.x + 16, destRect.y + 16, srcRect.x, srcRect.y, srcRect.x + 16, srcRect.y + 16, null);
+                //int overridenum = Array.IndexOf(NSMBTileset.BehaviorOverrides, GFX.Tilesets[Tileset].TileBehaviors[t]);
+                //if (overridenum > -1)
+                //    g.drawImage(Resources.get("tileoverrides2"), destRect.x, destRect.y, new Rectangle(overridenum * 16, 0, 16, 16), GraphicsUnit.Pixel);
+            }
     }
 
     public void renderTilemap(int[][] tilemap, Rectangle bounds)
@@ -240,42 +200,6 @@ public class NSMBObject implements LevelItem
                 }
     }
 
-    public void RenderPlain(Graphics2D g, int X, int Y)
-    {
-
-        Rectangle srcRect = new Rectangle(0, 0, 16, 16);
-        Rectangle destRect = new Rectangle(X, Y, 16, 16);
-
-        for (int xx = 0; xx < CachedObj.length; xx++)
-            for (int yy = 0; yy < CachedObj[0].length; yy++)
-            {
-                int t = CachedObj[xx][yy];
-                if (t < 0)
-                    continue;
-
-                destRect.x = X + xx * 16;
-                destRect.y = Y + yy * 16;
-
-                srcRect.x = (t % 16) * 16;
-                srcRect.y = (t / 16) * 16;
-
-                g.drawImage(GFX.Tilesets[Tileset].Map16Buffer, destRect.x, destRect.y, destRect.x+16, destRect.y+16, srcRect.x, srcRect.y, srcRect.x+16, srcRect.y+16, null);
-
-                if (!GFX.Tilesets[Tileset].UseOverrides)
-                    continue;
-                int t2 = GFX.Tilesets[Tileset].Overrides[t];
-                if (t2 <= 0)
-                    continue;
-
-                srcRect.x = t2 * 16;
-                srcRect.y = 0;
-
-                g.drawImage(GFX.Tilesets[Tileset].OverrideBufferedImage, destRect.x, destRect.y, destRect.x+16, destRect.y+16, srcRect.x, srcRect.y, srcRect.x+16, srcRect.y+16, null);
-                //int overridenum = Array.IndexOf(NSMBTileset.BehaviorOverrides, GFX.Tilesets[Tileset].TileBehaviors[t]);
-                //if (overridenum > -1)
-                //    g.drawImage(Resources.get("tileoverrides2"), destRect.x, destRect.y, new Rectangle(overridenum * 16, 0, 16, 16), GraphicsUnit.Pixel);
-            }
-    }
     /*
      @Override
      public String toString()
@@ -310,7 +234,6 @@ public class NSMBObject implements LevelItem
      idx += 7;
      return o;
      }*/
-
     public static NSMBObject read(ArrayReader in, NSMBGraphics gfx)
     {
         NSMBObject o = new NSMBObject();

@@ -226,4 +226,13 @@ public class Util
     {
         return String.format("%03d", n);
     }
+    
+    public static int roundDown(int i, int snap)
+    {
+        return i - i%snap;
+    }
+    public static int roundUp(int i, int snap)
+    {
+        return roundDown(i+snap-1, snap);
+    }
 }

@@ -30,8 +30,8 @@ public class NSMBView implements LevelItem
 
     public int X;
     public int Y;
-    public int Width;
-    public int Height;
+    public int Width = 256;
+    public int Height = 192;
     public int Number;
 //        public int Camera;
     public int Music;
@@ -52,6 +52,11 @@ public class NSMBView implements LevelItem
     {
     }
 
+    public NSMBView(boolean isZone)
+    {
+        this.isZone = isZone;
+    }
+    
     public NSMBView(NSMBView v)
     {
         X = v.X;

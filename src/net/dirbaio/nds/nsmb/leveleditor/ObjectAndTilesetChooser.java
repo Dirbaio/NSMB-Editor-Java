@@ -59,12 +59,12 @@ public class ObjectAndTilesetChooser extends JPanel
         add(tabs, BorderLayout.CENTER);
     }
 
-    private void addObjectAndTilesetChangeListener(ObjectAndTilesetChangeListener listener)
+    public void addObjectAndTilesetChangeListener(ObjectAndTilesetChangeListener listener)
     {
         listeners.add(listener);
     }
 
-    private void removeObjectAndTilesetChangeListener(ObjectAndTilesetChangeListener listener)
+    public void removeObjectAndTilesetChangeListener(ObjectAndTilesetChangeListener listener)
     {
         listeners.remove(listener);
     }
