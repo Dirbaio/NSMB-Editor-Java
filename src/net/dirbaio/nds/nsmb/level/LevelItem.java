@@ -43,4 +43,7 @@ public interface LevelItem
 
     //Renders the object itself.
     public void render(Graphics2D g, LevelEditorComponent ed);
+    
+    //Creates a copy of the object
+    public LevelItem clone();
 }

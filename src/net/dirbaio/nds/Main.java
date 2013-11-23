@@ -18,6 +18,7 @@ package net.dirbaio.nds;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.UIManager;
 import net.dirbaio.nds.fs.ExternalFile;
 import net.dirbaio.nds.nsmb.NSMBRom;
 import net.dirbaio.nds.fs.NitroROMFilesystem;
@@ -33,10 +34,15 @@ public class Main
 
     public static void main(String[] args)
     {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            
+        }
         try
         {
-            NitroROMFilesystem fs = new NitroROMFilesystem(new ExternalFile("nsmb.nds"));
-            NSMBRom rom = new NSMBRom(fs);
+            //NitroROMFilesystem fs = new NitroROMFilesystem(new ExternalFile("nsmb.nds"));
+            //NSMBRom rom = new NSMBRom(fs);
             /*
              byte[] data = rom.arm9ovs[0].getDecompressedData();
              OutputStream out = new FileOutputStream("ov0.bin");
@@ -58,9 +64,14 @@ public class Main
 //            NetFSServer s = new NetFSServer(fs);
 //            s.run();
 
-            NSMBLevel l = new NSMBLevel(rom, new InternalLevelSource(rom, "A01_1", "1-1"));
+            //NSMBLevel l = new NSMBLevel(rom, new InternalLevelSource(rom, "A01_1", "1-1"));
             
-            new ComponentFrame(new LevelEditor(l), false).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            //new ComponentFrame(new LevelEditor(l), false).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            LevelEditor e = new LevelEditor();
+            e.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            e.setVisible(true);
+            //new LevelEditor(l).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            
             //LevelEditorComponent ed = new LevelEditorComponent(l);
             //new ComponentFrame(ed, true).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //            new ComponentFrame(new FilesystemBrowser(fs)).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

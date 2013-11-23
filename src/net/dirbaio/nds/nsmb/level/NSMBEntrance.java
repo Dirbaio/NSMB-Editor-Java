@@ -74,6 +74,12 @@ public class NSMBEntrance implements LevelItem
         return 1;
     }
 
+    @Override
+    public LevelItem clone()
+    {
+        return new NSMBEntrance(this);
+    }
+
     public NSMBEntrance()
     {
     }
@@ -98,7 +104,6 @@ public class NSMBEntrance implements LevelItem
     @Override
     public void render(Graphics2D g, LevelEditorComponent ed)
     {
-
         int EntranceArrowColour = 0;
         // connected pipes have the grey blob (or did, it's kind of pointless)
             /*if (((Type >= 3 && Type <= 6) || (Type >= 16 && Type <= 19) || (Type >= 22 && Type <= 25)) && (Settings & 8) != 0) {

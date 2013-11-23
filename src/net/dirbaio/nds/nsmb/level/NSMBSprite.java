@@ -100,6 +100,12 @@ public class NSMBSprite implements LevelItem
     {
         return 16;
     }
+    
+    @Override
+    public LevelItem clone()
+    {
+        return new NSMBSprite(this);
+    }
 
     @Override
     public Rectangle getRect()

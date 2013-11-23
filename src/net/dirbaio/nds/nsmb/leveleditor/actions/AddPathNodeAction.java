@@ -33,14 +33,14 @@ public class AddPathNodeAction extends LvlItemAction
     @Override
     public void Undo()
     {
-        EdControl.level.remove(objs);
+        EdControl.level.objs.remove(objs);
         Deselect();
     }
 
     @Override
     public void Redo()
     {
-        EdControl.level.add(objs, zIndex);
+        EdControl.level.objs.add(objs, zIndex);
         SelectObjects();
     }
 

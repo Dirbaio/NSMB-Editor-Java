@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import net.dirbaio.nds.nsmb.level.NSMBGraphics;
+import net.dirbaio.nds.nsmb.level.NSMBObject;
 
 public class ObjectAndTilesetChooser extends JPanel
 {
@@ -88,6 +89,11 @@ public class ObjectAndTilesetChooser extends JPanel
     public int getSelectedTileset()
     {
         return selectedTileset;
+    }
+    
+    public NSMBObject getSelectedNSMBObject()
+    {
+        return choosers[selectedTileset].getSelectedNSMBObject();
     }
 
     private void fireChangedEvent()

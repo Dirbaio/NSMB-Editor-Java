@@ -32,8 +32,8 @@ public class RaiseLvlItemAction extends LvlItemAction
     @Override
     public void Undo()
     {
-        EdControl.level.remove(objs);
-        EdControl.level.add(objs, zIndex);
+        EdControl.level.objs.remove(objs);
+        EdControl.level.objs.add(objs, zIndex);
         repaintObjectRectangle();
     }
 
@@ -41,10 +41,10 @@ public class RaiseLvlItemAction extends LvlItemAction
     public void Redo()
     {
         if (zIndex == null)
-            zIndex = EdControl.level.removeZIndex(objs);
+            zIndex = EdControl.level.objs.removeZIndex(objs);
         else
-            EdControl.level.remove(objs);
-        EdControl.level.add(objs);
+            EdControl.level.objs.remove(objs);
+        EdControl.level.objs.add(objs);
         repaintObjectRectangle();
     }
 }

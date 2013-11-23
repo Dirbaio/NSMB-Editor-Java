@@ -113,6 +113,12 @@ public class NSMBObject implements LevelItem
     {
         return 16;
     }
+    
+    @Override
+    public LevelItem clone()
+    {
+        return new NSMBObject(this);
+    }
 
     public final void UpdateObjCache()
     {

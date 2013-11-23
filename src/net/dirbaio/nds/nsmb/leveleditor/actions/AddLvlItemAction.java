@@ -31,7 +31,7 @@ public class AddLvlItemAction extends LvlItemAction
     @Override
     public void Undo()
     {
-        EdControl.level.remove(objs);
+        EdControl.level.objs.remove(objs);
         repaintObjectRectangle();
         Deselect();
     }
@@ -39,7 +39,7 @@ public class AddLvlItemAction extends LvlItemAction
     @Override
     public void Redo()
     {
-        EdControl.level.add(objs);
+        EdControl.level.objs.add(objs);
         repaintObjectRectangle();
         SelectObjects();
     }

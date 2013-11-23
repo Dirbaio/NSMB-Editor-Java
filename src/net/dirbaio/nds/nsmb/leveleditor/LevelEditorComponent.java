@@ -38,6 +38,7 @@ import net.dirbaio.nds.nsmb.level.NSMBSprite;
 import net.dirbaio.nds.nsmb.level.NSMBView;
 import net.dirbaio.nds.nsmb.leveleditor.actions.AddLvlItemAction;
 import net.dirbaio.nds.nsmb.leveleditor.actions.AddPathNodeAction;
+import net.dirbaio.nds.nsmb.leveleditor.actions.ChangeObjectTypeAction;
 import net.dirbaio.nds.nsmb.leveleditor.actions.LowerLvlItemAction;
 import net.dirbaio.nds.nsmb.leveleditor.actions.MoveResizeLvlItemAction;
 import net.dirbaio.nds.nsmb.leveleditor.actions.RaiseLvlItemAction;
@@ -46,7 +47,8 @@ import net.dirbaio.nds.util.Colors;
 import net.dirbaio.nds.util.Resources;
 import net.dirbaio.nds.util.Util;
 
-public class LevelEditorComponent extends JComponent implements MouseListener, MouseMotionListener
+public class LevelEditorComponent extends JComponent
+    implements MouseListener, MouseMotionListener, ObjectAndTilesetChangeListener
 {
 
     public final NSMBLevel level;
@@ -73,13 +75,15 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
     private boolean createMode;
     private boolean mouseIn = false;
     private boolean selectionChanged;
+    
+    public ObjectAndTilesetChooser objPicker;
 
     public LevelEditorComponent(NSMBLevel level, LevelEditor editor)
     {
         this.level = level;
         this.editor = editor;
-        setPreferredSize(new Dimension(512 * 16, 256 * 16));
-        setSize(new Dimension(512 * 16, 256 * 16));
+        setPreferredSize(new Dimension(NSMBLevel.WIDTH * 16, NSMBLevel.HEIGHT * 16));
+        setSize(new Dimension(NSMBLevel.WIDTH * 16, NSMBLevel.HEIGHT * 16));
 
         renderer = new TilemapRenderer(level.levelTilemap, level.GFX);
         undo = new UndoManager(this);
@@ -92,7 +96,6 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         placingItem.setRect(new Rectangle(0, 0, 100, 100));
     }
 
-    
     private void updatePanel()
     {
         editor.setPanel((ArrayList<LevelItem>)SelectedObjects.clone());
@@ -105,7 +108,7 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
 
         pixels = g.getClipBounds();
         blocks = new Rectangle(pixels.x / 16, pixels.y / 16, (pixels.width + 15) / 16, (pixels.height + 15) / 16);
-        if (blocks.width == 512 || blocks.height == 256)
+        if (blocks.width == NSMBLevel.WIDTH || blocks.height == NSMBLevel.HEIGHT)
             return;
 
         // RENDER PANNING BLOCKS GRID
@@ -146,22 +149,23 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         renderer.render(g, blocks);
 
         // And now level stuff
-        for (NSMBSprite s : level.Sprites)
+        // Not done with iterator because it needs to skip objects
+        for (NSMBSprite s : level.objs.Sprites)
             if (s.AlwaysDraw() || pixels.intersects(s.getRect()))
                 s.render(g, this);
 
-        for (NSMBEntrance n : level.Entrances)
+        for (NSMBEntrance n : level.objs.Entrances)
             if (pixels.intersects(n.getRect()))
                 n.render(g, this);
 
-        for (NSMBView v : level.Views)
+        for (NSMBView v : level.objs.Views)
             v.render(g, this);
-        for (NSMBView v : level.Zones)
+        for (NSMBView v : level.objs.Zones)
             v.render(g, this);
 
-        for (NSMBPath p : level.Paths)
+        for (NSMBPath p : level.objs.Paths)
             p.render(g, this);
-        for (NSMBPath p : level.ProgressPaths)
+        for (NSMBPath p : level.objs.ProgressPaths)
             p.render(g, this);
 
         if (placingItem != null && !SelectMode && mouseIn && SelectedObjects.isEmpty())
@@ -288,9 +292,9 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         if (createMode)
         {
             ArrayList<LevelItem> list = new ArrayList<>();
-            list.add(placingItem);
+            list.add(placingItem.clone());
             undo.Do(new AddLvlItemAction(list));
-            placingItem = editor.palette.getPlacingObject();
+            //placingItem = editor.palette.getPlacingObject();
             repaint();
         }
         
@@ -524,22 +528,8 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
     {
         SelectedObjects.clear();
         CurSelectedObjs.clear();
-        for (NSMBObject o : level.Objects)
-            SelectedObjects.add(o);
-        for (NSMBSprite s : level.Sprites)
-            SelectedObjects.add(s);
-        for (NSMBEntrance e : level.Entrances)
-            SelectedObjects.add(e);
-        for (NSMBView v : level.Views)
-            SelectedObjects.add(v);
-        for (NSMBView z : level.Zones)
-            SelectedObjects.add(z);
-        for (NSMBPath p : level.Paths)
-            for (NSMBPathPoint pp : p.points)
-                SelectedObjects.add(pp);
-        for (NSMBPath p : level.ProgressPaths)
-            for (NSMBPathPoint pp : p.points)
-                SelectedObjects.add(pp);
+        for (LevelItem i : level.objs)
+            SelectedObjects.add(i);
         UpdateSelectionBounds();
     }
 
@@ -707,22 +697,8 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         if (r.height <= 0)
             r.height = 1;
         SelectionRectangle = r;
-        for (NSMBObject o : level.Objects)
-            selectIfInside(o, r);
-        for (NSMBSprite o : level.Sprites)
-            selectIfInside(o, r);
-        for (NSMBEntrance o : level.Entrances)
-            selectIfInside(o, r);
-        for (NSMBView v : level.Views)
-            selectIfInside(v, r);
-        for (NSMBView z : level.Zones)
-            selectIfInside(z, r);
-        for (NSMBPath p : level.Paths)
-            for (NSMBPathPoint pp : p.points)
-                selectIfInside(pp, r);
-        for (NSMBPath p : level.ProgressPaths)
-            for (NSMBPathPoint pp : p.points)
-                selectIfInside(pp, r);
+        for (LevelItem i : level.objs)
+            selectIfInside(i, r);
 
         if (firstOnly && SelectedObjects.size() > 1)
         {
@@ -902,24 +878,23 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
         ArrayList<LevelItem> newObjects = new ArrayList<>();
         for (LevelItem SelectedObject : Objects)
         {
-            if (SelectedObject instanceof NSMBObject)
-                newObjects.add(new NSMBObject((NSMBObject) SelectedObject));
-            if (SelectedObject instanceof NSMBSprite)
-                newObjects.add(new NSMBSprite((NSMBSprite) SelectedObject));
-            if (SelectedObject instanceof NSMBEntrance)
-                newObjects.add(new NSMBEntrance((NSMBEntrance) SelectedObject));
-            if (SelectedObject instanceof NSMBView)
-                newObjects.add(new NSMBView((NSMBView) SelectedObject));
-            if (SelectedObject instanceof NSMBPathPoint)
-                newObjects.add(new NSMBPathPoint((NSMBPathPoint) SelectedObject));
+            newObjects.add(SelectedObject.clone());
         }
 
         return newObjects;
     }
 
+    @Override
+    public void objectAndTilesetChanged(int newObject, int newTileset) {
+        if (SelectedObjects.isEmpty()) {
+            placingItem = objPicker.getSelectedNSMBObject();
+        } else {
+            undo.Do(new ChangeObjectTypeAction(SelectedObjects, newTileset, newObject));
+        }
+    }
+
     enum ResizeType
     {
-
         ResizeBegin,
         ResizeNone,
         ResizeEnd
@@ -927,7 +902,6 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
 
     enum CreateNode
     {
-
         None,
         Before,
         After
@@ -935,7 +909,6 @@ public class LevelEditorComponent extends JComponent implements MouseListener, M
 
     class MouseAction
     {
-
         public boolean drag = false;
         public ResizeType vert = ResizeType.ResizeNone;
         public ResizeType hor = ResizeType.ResizeNone;

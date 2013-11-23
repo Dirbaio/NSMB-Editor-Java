@@ -77,6 +77,11 @@ public class ObjectChooser extends JScrollPane
     {
         return selectedObject;
     }
+    
+    public NSMBObject getSelectedNSMBObject()
+    {
+        return new NSMBObject(selected);
+    }
 
     public void addObjectChangeListener(ObjectChangeListener l)
     {

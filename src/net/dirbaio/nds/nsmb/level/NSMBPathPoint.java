@@ -68,6 +68,12 @@ public class NSMBPathPoint implements LevelItem
     {
         return 1;
     }
+    
+    @Override
+    public LevelItem clone()
+    {
+        return new NSMBPathPoint(this);
+    }
 
     public NSMBPathPoint(NSMBPath p)
     {

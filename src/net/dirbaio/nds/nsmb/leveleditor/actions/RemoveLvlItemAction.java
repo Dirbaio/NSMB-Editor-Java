@@ -32,7 +32,7 @@ public class RemoveLvlItemAction extends LvlItemAction
     @Override
     public void Undo()
     {
-        EdControl.level.add(objs, zIndex);
+        EdControl.level.objs.add(objs, zIndex);
         repaintObjectRectangle();
         SelectObjects();
     }
@@ -41,9 +41,9 @@ public class RemoveLvlItemAction extends LvlItemAction
     public void Redo()
     {
         if (zIndex == null)
-            zIndex = EdControl.level.removeZIndex(objs);
+            zIndex = EdControl.level.objs.removeZIndex(objs);
         else
-            EdControl.level.remove(objs);
+            EdControl.level.objs.remove(objs);
         Deselect();
         repaintObjectRectangle();
     }

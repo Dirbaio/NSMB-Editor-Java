@@ -32,8 +32,8 @@ public class LowerLvlItemAction extends LvlItemAction
     @Override
     public void Undo()
     {
-        EdControl.level.remove(objs);
-        EdControl.level.add(objs, zIndex);
+        EdControl.level.objs.remove(objs);
+        EdControl.level.objs.add(objs, zIndex);
         repaintObjectRectangle();
     }
 
@@ -41,12 +41,12 @@ public class LowerLvlItemAction extends LvlItemAction
     public void Redo()
     {
         if (zIndex == null)
-            zIndex = EdControl.level.removeZIndex(objs);
+            zIndex = EdControl.level.objs.removeZIndex(objs);
         else
-            EdControl.level.remove(objs);
+            EdControl.level.objs.remove(objs);
         // Loop in backwards order so the z-order of the selected Objects is kept the same.
         for (int i = objs.size() - 1; i >= 0; i--)
-            EdControl.level.add(objs.get(i), 0);
+            EdControl.level.objs.add(objs.get(i), 0);
         repaintObjectRectangle();
     }
 }
